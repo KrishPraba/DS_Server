@@ -4,6 +4,7 @@ import K5s.storage.Server;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,16 +26,33 @@ public class ChatServer extends Server {
         globalServerState = new HashMap<>();
     }
 
+    /**
+     * receive the gossip message from the server socker and update the global state object of the local copy accordingly
+     *
+     * @param gossip
+     */
     public void updateState(JSONObject gossip){
-        JSONObject state = (JSONObject) gossip.get("state");
+        Map<String,ArrayList<String>> state = (Map<String, ArrayList<String>>) gossip.get("serverRooms");
         ArrayList<String > identity = (ArrayList<String>) gossip.get("identity");
+
+//        for each identity in the received gossip add them to the local identity list
         for (String i :identity) {
             if (!globalIdentity.contains(i)){
                 globalIdentity.add(i);
             }
-
         }
-//        TODO: update server state
+//        for each server's room list if the record not found in the local copy update accordingly
+        state.keySet().forEach(server->{
+            if (server!=this.getServerId()){
+                if(globalServerState.containsKey(server)){
+                    for (String s :state.get(server)){
+                        if (!globalServerState.get(server).contains(s)){
+                            globalServerState.get(server).add(s);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**

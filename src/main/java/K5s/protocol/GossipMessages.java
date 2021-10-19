@@ -8,12 +8,14 @@ import java.util.List;
 public class GossipMessages {
 
     /**
-     * * {
-     * * serverRooms:{
-     * serverId:[roomId]
-     * },
-     * * identity:{}
-     * * }
+     * {
+     *    state:{
+     *          serverRooms:{
+     *              serverId:[roomId]
+     *          },
+     *          identity:{}
+     *   }
+     *   gossipServerList:[<remaining servers to be gossiped>]
      *
      * @param state
      * @param gossipServerList

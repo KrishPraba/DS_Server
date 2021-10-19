@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerToClientMessages {
+    
+    
     public static JSONObject getCreateRoomRequest(String roomid) {
         JSONObject create_room = new JSONObject();
         create_room.put("type", "createroom");

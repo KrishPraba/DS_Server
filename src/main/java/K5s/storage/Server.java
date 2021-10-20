@@ -1,5 +1,8 @@
 package K5s.storage;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 
 public class Server {
@@ -7,6 +10,8 @@ public class Server {
     private final String ipAddress;
     private final int clientPort ;
     private final int coordinationPort ;
+    private ServerSocket clientServerSocket,serverServerSocket;
+    private Socket socket;
     private ArrayList<String> roomIds;
 
     /**
@@ -65,6 +70,25 @@ public class Server {
      */
     public synchronized int getCoordinationPort() {
         return this.coordinationPort;
+    }
+
+    public ServerSocket getClientServerSocket() throws IOException {
+        if (clientServerSocket==null){
+            this.clientServerSocket=new ServerSocket(this.getClientPort(), 50);
+        }
+        return clientServerSocket;
+    }
+    public ServerSocket getServerServerSocket() throws IOException {
+        if (serverServerSocket==null){
+            this.serverServerSocket=new ServerSocket(this.getCoordinationPort(), 50);
+        }
+        return serverServerSocket;
+    }
+    public Socket getSocket() throws IOException {
+        if (socket==null){
+            this.socket=new Socket(this.ipAddress, this.getCoordinationPort());
+        }
+        return socket;
     }
 
 }

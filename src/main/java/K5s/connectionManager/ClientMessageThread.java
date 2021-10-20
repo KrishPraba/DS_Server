@@ -47,6 +47,7 @@ public class ClientMessageThread implements Runnable{
      * wait on the BufferReader for new messages ,parse them and pass them to MessageReceive method
      * catch IoException and follow Quit protocol
      */
+    @Override
     public void run() {
         try {
             this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));

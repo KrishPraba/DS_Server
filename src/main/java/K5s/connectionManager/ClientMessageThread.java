@@ -41,7 +41,12 @@ public class ClientMessageThread implements Runnable{
         this.client = null;
         this.server = server;
     }
-
+    public ChatClient getClient(){
+        return client;
+    }
+    public void setClient(ChatClient client){
+        this.client=client;
+    }
     /**
      * create a new BufferReader to read TCP inputStream to the socket specified
      * wait on the BufferReader for new messages ,parse them and pass them to MessageReceive method
@@ -118,10 +123,11 @@ public class ClientMessageThread implements Runnable{
                     this.in.close();
                     socket.close();
                 } else {
-                    this.client = manager.newIdentity(identity,this);
-                    if (this.client != null){
-                        send(getNewIdentityReply(identity,true));
-                        manager.sendMainhallBroadcast(this.client);
+
+                    if (manager.newIdentity(identity,this)){
+                        System.out.println("User waiting for leader approval.");
+//                        send(getNewIdentityReply(identity,true));
+//                        manager.sendMainhallBroadcast(this.client);
                     }
                     else{
                         send(getNewIdentityReply(identity,false));
@@ -211,10 +217,10 @@ public class ClientMessageThread implements Runnable{
                 String formerRoomid = (String) message.get("former");
                 String clientIdentity = (String) message.get("identity");
 
-                boolean isServerChange = manager.moveJoinRoom(clientIdentity, joinRoomid, this, formerRoomid);
-                if(isServerChange){
-                    send(getMoveJoinReply(clientIdentity,true,this.server.getServerId()));
-                }
+                manager.moveJoinRoom(clientIdentity, joinRoomid, this, formerRoomid);
+//                if(!isServerChange){
+//                    send(getMoveJoinReply(clientIdentity,true,this.server.getServerId()));
+//                }
 
                 break;
             case "deleteroom":

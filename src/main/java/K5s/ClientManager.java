@@ -1,18 +1,21 @@
 package K5s;
 
 import K5s.connectionManager.ClientMessageThread;
+//import K5s.storage.ChatClient;
 import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import static K5s.protocol.ServerToClientMessages.*;
 
 public class ClientManager {
 
-    private ArrayList<ChatClient> chatClients;
-    private RoomManager roomManager;
+    private static ArrayList<ChatClient> chatClients;
+    private static RoomManager roomManager;
+    private static Map<String ,ClientMessageThread> identitySubscribers;
 
     public ClientManager(RoomManager manager){
         chatClients = new ArrayList<>();
@@ -20,32 +23,54 @@ public class ClientManager {
 
     }
 
-    public synchronized ChatClient newIdentity(String identity, ClientMessageThread clientMessageThread){
+    public synchronized boolean newIdentity(String identity, ClientMessageThread clientMessageThread){
 
-        if (isAvailableIdentity(identity)) {
+        if (isAvailableIdentity(identity ,clientMessageThread)) {
+            System.out.println("User waiting for approval.");
+            return true;
+//            ChatClient user = new ChatClient(identity, clientMessageThread);
+//            chatClients.add(user);
+//            user.setRoom(roomManager.getMainHall());
+//            roomManager.addToMainHall(user);
+//            return user;
+        } else {
+            System.out.println(identity + " already in use.");
+            return false;
+        }
+    }
+    public static void replyIdentityRequest(String identity,boolean approved){
+        if(identitySubscribers.containsKey(identity)){
             System.out.println("User has been approved.");
-            ChatClient user = new ChatClient(identity, clientMessageThread);
+            ClientMessageThread clientMessageThread=identitySubscribers.get(identity);
+            ChatClient user = new ChatClient(identity,clientMessageThread );
             chatClients.add(user);
             user.setRoom(roomManager.getMainHall());
             roomManager.addToMainHall(user);
-            return user;
-        } else {
-            System.out.println(identity + " already in use.");
-            return null;
+            clientMessageThread.setClient(user);
+            sendMainhallBroadcast(user);
+            identitySubscribers.remove(identity);
+        }else{
+            //server detected timeout and reply to the client that identity not available to ensure availability
+//            TODO:inform leader to delete the approved identity
         }
-    }
 
-    public synchronized boolean isAvailableIdentity(String identity) {
+    }
+    public synchronized boolean isAvailableIdentity(String identity,ClientMessageThread clientMessageThread) {
         for (ChatClient u : chatClients) {
             if (u.getChatClientID().equalsIgnoreCase(identity)) {
                 return false;
             }
         }
-//        TODO : check availablity of the idenity in the system by asking leader
-        return true;
+
+        if(ServerManager.isAvailableIdentity(identity)){
+            identitySubscribers.put(identity,clientMessageThread);
+            return true;
+        }else {
+            return false;
+        }
     }
 
-    public void sendMainhallBroadcast(ChatClient client){
+    public static void sendMainhallBroadcast(ChatClient client){
         JSONObject message = getRoomChangeBroadcast(client.getChatClientID(), "", "MainHall-s1");
         roomManager.broadcastMessageToMembers(roomManager.getMainHall(),message);
     }
@@ -53,7 +78,7 @@ public class ClientManager {
     public ArrayList<String> listRoomIds(){
         ArrayList<String> roomIds = roomManager.getRoomIds();
 
-        // TODO : get list of other rooms in system by referring other server details thru server manager
+        // TODO : get list of other rooms in system by referring other server details through server manager
         return roomIds;
     }
 
@@ -119,23 +144,20 @@ public class ClientManager {
         return false;
     }
 
-    public synchronized boolean moveJoinRoom(String identity, String joinRoomId, ClientMessageThread recieveThread,
+    public synchronized void moveJoinRoom(String identity, String joinRoomId, ClientMessageThread recieveThread,
                                           String formerRoomId){
         ChatRoom room = roomManager.findRoomExists(joinRoomId);
-        ChatClient client = newIdentity(identity, recieveThread);
-        if((room != null) && (client != null)){
-            roomManager.getMainHall().removeMember(client);
-            JSONObject message = getRoomChangeBroadcast(client.getChatClientID(),formerRoomId,room.getRoomId());
-            client.setRoom(room);
-            room.addMember(client);
-            roomManager.broadcastMessageToMembers(room,message);
-            return true;
+        if(room != null){
+            if(newIdentity(identity, recieveThread)){
+
+            }
         }
         else{
-            ChatRoom mainHall = roomManager.getMainHall();
-            JSONObject message = getRoomChangeBroadcast(client.getChatClientID(),formerRoomId,mainHall.getRoomId());
-            roomManager.broadcastMessageToMembers(mainHall,message);
-            return false;
+//            ChatRoom mainHall = roomManager.getMainHall();
+//            JSONObject message = getRoomChangeBroadcast(client.getChatClientID(),formerRoomId,mainHall.getRoomId());
+//            roomManager.broadcastMessageToMembers(mainHall,message);
+//        TODO:once move join received check the identity availability and if the identity is available then check whether room is available then if both available move
+            //TODO : verify with the requirements how to proceed if identity not available.
         }
     }
 

@@ -101,6 +101,7 @@ public class Main {
             //noinspection InfiniteLoopStatement
             RoomManager roomManager = new RoomManager(meServer);
             ClientManager clientManager = new ClientManager(roomManager);
+            ServerManager serverManager = ServerManager.getInstance(meServer);
             // start sending thread
 
             while (true) {

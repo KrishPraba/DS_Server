@@ -4,13 +4,10 @@ import K5s.storage.Server;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static K5s.protocol.LeaderProtocol.coordinatorMessage;
-import static K5s.protocol.LeaderProtocol.electionMessage;
+import java.util.Random;
 
 public class ChatServer extends Server {
 
@@ -20,8 +17,7 @@ public class ChatServer extends Server {
     private boolean isLeader = false;
     private String leader;
     private boolean electionInProgress = false;
-    private boolean isPossibleLeader =false;
-
+    private boolean isOkMessageReceived =false;
     /**
      * @param serverId         serverID
      * @param ipAddress        ipaddress of the current server
@@ -33,9 +29,14 @@ public class ChatServer extends Server {
         globalIdentity = new ArrayList<>();
         globalServerState = new HashMap<>();
     }
+    public void addNewIdentity(String identity){
+        globalIdentity.add(identity);
+//      TODO: need to validate the identity pattern and only approve valid pattern(no nessary since the server itself check for this)
+
+    }
 
     /**
-     * receive the gossip message from the server socker and update the global state object of the local copy accordingly
+     * receive the gossip message from the server socket and update the global state object of the local copy accordingly
      *
      * @param gossip
      */
@@ -64,6 +65,19 @@ public class ChatServer extends Server {
             }
         });
     }
+    public JSONObject getState(){
+        JSONObject state =new JSONObject();
+
+        state.put("serverRooms",new JSONObject(globalServerState));
+        state.put("identity", getIdentityJSONArray());
+        return state;
+    }
+    public String getRandomeNeighbour(){
+        return getOtherServerIdList().get(new Random().nextInt(otherServers.size()));
+    }
+    public String getLeader(){
+        return  this.leader;
+    }
 
     /**
      * add other servers in the system
@@ -87,7 +101,21 @@ public class ChatServer extends Server {
         }
         return null;
     }
-
+    public ArrayList<String> getOtherServerIdList(){
+        ArrayList<String> a= new ArrayList<>();
+        otherServers.forEach(s->a.add(s.getServerId()));
+        return  a;
+    }
+    public JSONArray getOtherServerIdJSONArray(){
+        JSONArray o =new JSONArray();
+        otherServers.forEach(s->o.add(s.getServerId()));
+        return  o;
+    }
+    public JSONArray getIdentityJSONArray(){
+        JSONArray o = new JSONArray();
+        globalIdentity.forEach(i->o.add(i));
+        return  o;
+    }
     public ArrayList<Server> getOtherServers(){
         return this.otherServers;
     }
@@ -111,11 +139,17 @@ public class ChatServer extends Server {
         return this.electionInProgress;
     }
 
-    public boolean isPossibleLeader() {
-        return isPossibleLeader;
+    public boolean isOkMessageReceived() {
+        return isOkMessageReceived;
     }
 
-    public void setIsPossibleLeader(boolean x){
-        this.isPossibleLeader = x;
+    public void setisOkMessageReceived(boolean x){
+        this.isOkMessageReceived = x;
+    }
+    public boolean isLeader(){
+        return isLeader;
+    }
+    public ArrayList<String> getGlobalIdentity(){
+        return this.globalIdentity;
     }
 }

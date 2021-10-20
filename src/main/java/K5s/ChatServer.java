@@ -10,9 +10,9 @@ import java.util.Map;
 
 public class ChatServer extends Server {
 
-    private ArrayList<Server> otherServers = new ArrayList<>();
-    private Map<String,ArrayList<String>> globalServerState;
-    private ArrayList<String> globalIdentity;
+    private final ArrayList<Server> otherServers = new ArrayList<>();
+    private final Map<String, ArrayList<String>> globalServerState;
+    private final ArrayList<String> globalIdentity;
 
     /**
      * @param serverId         serverID
@@ -31,24 +31,24 @@ public class ChatServer extends Server {
      *
      * @param gossip
      */
-    public void updateState(JSONObject gossip){
-        Map<String,JSONArray> state = (Map<String, JSONArray>) gossip.get("serverRooms");
+    public void updateState(JSONObject gossip) {
+        Map<String, JSONArray> state = (Map<String, JSONArray>) gossip.get("serverRooms");
         JSONArray identity = (JSONArray) gossip.get("identity");
 
 //        for each identity in the received gossip add them to the local identity list
-        for (Object i :identity) {
-            String identityString= (String) i;
-            if (!globalIdentity.contains(identityString)){
+        for (Object i : identity) {
+            String identityString = (String) i;
+            if (!globalIdentity.contains(identityString)) {
                 globalIdentity.add(identityString);
             }
         }
 //        for each server's room list if the record not found in the local copy update accordingly
-        state.keySet().forEach(server->{
-            if (server!=this.getServerId()){
-                if(globalServerState.containsKey(server)){
-                    for (Object s :state.get(server)){
-                        String serverString= (String) s;
-                        if (!globalServerState.get(server).contains(serverString)){
+        state.keySet().forEach(server -> {
+            if (server != this.getServerId()) {
+                if (globalServerState.containsKey(server)) {
+                    for (Object s : state.get(server)) {
+                        String serverString = (String) s;
+                        if (!globalServerState.get(server).contains(serverString)) {
                             globalServerState.get(server).add(serverString);
                         }
                     }
@@ -60,7 +60,7 @@ public class ChatServer extends Server {
     /**
      * add other servers in the system
      *
-     * @param server  server to be added
+     * @param server server to be added
      */
     public synchronized void addServer(Server server) {
         this.otherServers.add(server);
@@ -68,12 +68,13 @@ public class ChatServer extends Server {
 
     /**
      * get Server from serverId
-     * @param id  serverid
+     *
+     * @param id serverid
      * @return Server
      */
-    public Server getServer(String id){
-        for(Server server:otherServers){
-            if (server.getServerId().equals(id)){
+    public Server getServer(String id) {
+        for (Server server : otherServers) {
+            if (server.getServerId().equals(id)) {
                 return server;
             }
         }

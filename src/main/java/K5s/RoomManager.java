@@ -1,5 +1,7 @@
 package K5s;
 
+import static K5s.protocol.ServerToClientMessages.getRoomChangeBroadcast;
+
 import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
 import K5s.storage.Server;
@@ -8,31 +10,31 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static K5s.protocol.ServerToClientMessages.getRoomChangeBroadcast;
-
 public class RoomManager {
 
-    private ArrayList<ChatRoom> chatRooms;
-    private ChatRoom mainHall;
+    private final ArrayList<ChatRoom> chatRooms;
+    private final ChatRoom mainHall;
     private Server meserver;
 
-    public RoomManager(Server meserver){
-        this.mainHall = new ChatRoom("MainHall-s1",meserver.getServerId() );
+    public RoomManager(Server meserver) {
+        this.mainHall = new ChatRoom("MainHall-s1", meserver.getServerId());
         this.chatRooms = new ArrayList<>();
         chatRooms.add(this.mainHall);
     }
 
-    public synchronized void addToMainHall(ChatClient client){
+    public synchronized void addToMainHall(ChatClient client) {
         this.mainHall.addMember(client);
     }
 
-    public ChatRoom getMainHall(){ return this.mainHall;}
+    public ChatRoom getMainHall() {
+        return this.mainHall;
+    }
 
-    public synchronized void broadcastMessageToMembers(ChatRoom room, JSONObject jsonObject){
+    public synchronized void broadcastMessageToMembers(ChatRoom room, JSONObject jsonObject) {
         ArrayList<ChatClient> members = room.getMembers();
         members.forEach(user -> {
-            try{
-                if (user.getMessageThread()!=null) {
+            try {
+                if (user.getMessageThread() != null) {
                     user.getMessageThread().MessageReceive(jsonObject);
                 }
             } catch (IOException | NullPointerException e) {
@@ -41,9 +43,9 @@ public class RoomManager {
         });
     }
 
-    public void broadcastSeperateMessageToMember(ChatClient client, JSONObject jsonObject){
-        try{
-            if (client.getMessageThread()!=null) {
+    public void broadcastSeperateMessageToMember(ChatClient client, JSONObject jsonObject) {
+        try {
+            if (client.getMessageThread() != null) {
                 client.getMessageThread().MessageReceive(jsonObject);
             }
         } catch (IOException | NullPointerException e) {
@@ -51,16 +53,16 @@ public class RoomManager {
         }
     }
 
-    public ArrayList<String> getRoomIds(){
-        ArrayList<String> roomIds =new ArrayList<>();
+    public ArrayList<String> getRoomIds() {
+        ArrayList<String> roomIds = new ArrayList<>();
         this.chatRooms.forEach(room -> roomIds.add(room.getRoomId()));
         return roomIds;
     }
 
-    public synchronized boolean isRoomIdAvailableToCreate(String roomId){
+    public synchronized boolean isRoomIdAvailableToCreate(String roomId) {
         if ((roomId.matches("[a-zA-Z0-9]+")) && (Character.isAlphabetic(roomId.charAt(0)))
-                && (roomId.length() >= 3) && (roomId.length()<=16)){
-            for (ChatRoom room:chatRooms){
+                && (roomId.length() >= 3) && (roomId.length() <= 16)) {
+            for (ChatRoom room : chatRooms) {
                 if (room.getRoomId().equalsIgnoreCase(roomId)) {
                     return false;
                 }
@@ -72,26 +74,21 @@ public class RoomManager {
     }
 
 
-    public synchronized ChatRoom createRoom(String roomId, ChatClient client){
+    public synchronized ChatRoom createRoom(String roomId, ChatClient client) {
         ChatRoom room = new ChatRoom(roomId, client);
         this.chatRooms.add(room);
         return room;
     }
 
-    public synchronized boolean removeUserFromChatRoom(ChatClient client){
+    public synchronized boolean removeUserFromChatRoom(ChatClient client) {
 
         ChatRoom room = client.getRoom();
         room.removeMember(client);
-        if (client.equals(room.getOwner())){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return client.equals(room.getOwner());
     }
 
-    public ChatClient findOwnerOfRoom(String roomId){
-        for(ChatRoom room: this.chatRooms){
+    public ChatClient findOwnerOfRoom(String roomId) {
+        for (ChatRoom room : this.chatRooms) {
             if (room.getRoomId().equalsIgnoreCase(roomId)) {
                 return room.getOwner();
             }
@@ -99,8 +96,8 @@ public class RoomManager {
         return null;
     }
 
-    public boolean findIfOwner(ChatClient client){
-        for(ChatRoom room: this.chatRooms){
+    public boolean findIfOwner(ChatClient client) {
+        for (ChatRoom room : this.chatRooms) {
             if (room.getOwner().equals(client)) {
                 return true;
             }
@@ -108,22 +105,22 @@ public class RoomManager {
         return false;
     }
 
-    public synchronized void deleteRoom(ChatRoom room){
+    public synchronized void deleteRoom(ChatRoom room) {
         ArrayList<ChatClient> members = room.getMembers();
-        for (ChatClient client:members) {
-            JSONObject message =getRoomChangeBroadcast(client.getChatClientID(),room.getRoomId(),mainHall.getRoomId());
+        for (ChatClient client : members) {
+            JSONObject message = getRoomChangeBroadcast(client.getChatClientID(), room.getRoomId(), mainHall.getRoomId());
             broadcastSeperateMessageToMember(client, message);
             room.removeMember(client);
-            JSONObject message2 = getRoomChangeBroadcast(client.getChatClientID(),room.getRoomId(),mainHall.getRoomId());
-            broadcastMessageToMembers(mainHall,message2);
+            JSONObject message2 = getRoomChangeBroadcast(client.getChatClientID(), room.getRoomId(), mainHall.getRoomId());
+            broadcastMessageToMembers(mainHall, message2);
             mainHall.addMember(client);
             chatRooms.remove(room);
             client.setRoom(mainHall);
         }
     }
 
-    public ChatRoom findRoomExists(String roomId){
-        for(ChatRoom room: this.chatRooms){
+    public ChatRoom findRoomExists(String roomId) {
+        for (ChatRoom room : this.chatRooms) {
             if (room.getRoomId().equalsIgnoreCase(roomId)) {
                 return room;
             }

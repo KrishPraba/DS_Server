@@ -13,6 +13,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static K5s.protocol.GossipMessages.gossipMessage;
@@ -49,7 +51,6 @@ public class ServerMessageThread implements Runnable{
                 this.in.close();
 //                System.out.println("socket closed");
 //                this.serverServerSocket.close();
-//            }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -72,7 +73,7 @@ public class ServerMessageThread implements Runnable{
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                System.out.println("Server " + serverId + "is down");
+                                System.out.println("OK AND OR COORDINATOR Server " + serverId + " is down");
                             }
                         } else {
                             initiateLeaderElection();
@@ -88,14 +89,15 @@ public class ServerMessageThread implements Runnable{
                             meServer.setElectionInProgress(false);
                             System.out.println(serverId+ " has been elected as Leader.");
                         }
-
                         break;
 
                     case "OK":
                         System.out.println("OK received from "+serverId);
                         meServer.setElectionInProgress(true);
+                        meServer.setIsPossibleLeader(false);
+                        Timer timer = new Timer();
+                        timer.schedule(task, 4000);
                         break;
-
                     default:
                         System.out.println(message + " not configured");
                 }
@@ -125,9 +127,7 @@ public class ServerMessageThread implements Runnable{
     }
     private void send(JSONObject obj,String serverId) throws IOException {
         Server server=meServer.getServer(serverId);
-//        DataOutputStream out;
         if (server!=null){
-            System.out.println("server configured");
             Socket ss=server.getSocket();
             System.out.println(ss.getPort());
             OutputStream out = ss.getOutputStream();
@@ -141,8 +141,17 @@ public class ServerMessageThread implements Runnable{
 //        out.close();
     }
 
+    TimerTask task = new TimerTask() {
+        public void run() {
+            if (meServer.getElectionInProgress()&& meServer.isPossibleLeader()){
+                initiateLeaderElection();
+            }
+        }
+    };
+
     public void initiateLeaderElection(){
         meServer.setElectionInProgress(true);
+        meServer.setIsPossibleLeader(true);
         ArrayList<Server> otherServers = meServer.getOtherServers();
         int count = 0;
         for(Server s : otherServers){
@@ -151,7 +160,7 @@ public class ServerMessageThread implements Runnable{
                     send(electionMessage(meServer.getServerId()), s.getServerId());
                     count += 1;
                 }catch(IOException e){
-                    System.out.println("Server "+s.getServerId()+ "is down");
+                    System.out.println("ELECTION Server "+s.getServerId()+ "is down");
                 }
             }
         }
@@ -162,7 +171,7 @@ public class ServerMessageThread implements Runnable{
                 try{
                     send(coordinatorMessage(meServer.getServerId()), s.getServerId());
                 } catch(IOException e) {
-                    System.out.println("Server "+s.getServerId()+ " is down");
+                    System.out.println("COORDINATOR Server "+s.getServerId()+ " is down");
                 }
             }
 
@@ -170,6 +179,7 @@ public class ServerMessageThread implements Runnable{
             meServer.setElectionInProgress(false);
             System.out.println(meServer.getServerId()+ " is Leader");
         }
-
+        Timer timer = new Timer();
+        timer.schedule(task, 4000);
     }
 }

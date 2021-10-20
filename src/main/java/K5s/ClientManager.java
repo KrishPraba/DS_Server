@@ -3,12 +3,14 @@ package K5s;
 import K5s.connectionManager.ClientMessageThread;
 import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 
 import static K5s.protocol.ServerToClientMessages.*;
 
+@Slf4j
 public class ClientManager {
 
     private ArrayList<ChatClient> chatClients;
@@ -23,14 +25,14 @@ public class ClientManager {
     public synchronized ChatClient newIdentity(String identity, ClientMessageThread clientMessageThread){
 
         if (isAvailableIdentity(identity)) {
-            System.out.println("User has been approved.");
+            log.info("User has been approved.");
             ChatClient user = new ChatClient(identity, clientMessageThread);
             chatClients.add(user);
             user.setRoom(roomManager.getMainHall());
             roomManager.addToMainHall(user);
             return user;
         } else {
-            System.out.println(identity + " already in use.");
+            log.info("{} already in use.", identity);
             return null;
         }
     }

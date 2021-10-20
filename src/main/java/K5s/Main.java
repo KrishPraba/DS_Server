@@ -87,7 +87,7 @@ public class Main {
             System.out.println("InetClientPort: " + clientServerSocket.getLocalPort());
 
 
-            serverServerSocket=meServer.getClientServerSocket();
+            serverServerSocket=meServer.getServerServerSocket();
             serverServerSocket.setReuseAddress(true);
             System.out.println("InetServerAddress : " + serverServerSocket.getInetAddress());
             System.out.println("InetServerPort: " + serverServerSocket.getLocalPort());

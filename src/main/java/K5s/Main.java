@@ -1,6 +1,7 @@
 package K5s;
 
 import K5s.connectionManager.ClientMessageThread;
+import K5s.connectionManager.ServerMessageThread;
 import K5s.storage.Server;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -20,7 +21,8 @@ public class Main {
         ArrayList<Server> servers=new  ArrayList<>(); //list of
         ChatServer meServer = null;
         Socket clientSocket;
-        ServerSocket serverSocket;
+        ServerSocket clientServerSocket;
+        ServerSocket serverServerSocket;
 //        TODO initiate a different thread with new server socket for server to server communication
 
 
@@ -74,16 +76,24 @@ public class Main {
         try {
             assert meServer != null;
             /**
-             * create a new serverSocket for client server communication
+             * create a new clientServerSocket for client server communication
              * and listen on the port specified in the configuration file
              * allow reuse address
              * and set connection queue size to 50 : can be increased
              */
-            serverSocket = new ServerSocket(meServer.getClientPort(), 50);
-            serverSocket.setReuseAddress(true);
-            System.out.println("InetServerAddress : " + serverSocket.getInetAddress());
-            System.out.println("InetClientPort: " + serverSocket.getLocalPort());
+            clientServerSocket = meServer.getClientServerSocket();
+            clientServerSocket.setReuseAddress(true);
+            System.out.println("InetServerAddress : " + clientServerSocket.getInetAddress());
+            System.out.println("InetClientPort: " + clientServerSocket.getLocalPort());
 
+
+            serverServerSocket=meServer.getClientServerSocket();
+            serverServerSocket.setReuseAddress(true);
+            System.out.println("InetServerAddress : " + serverServerSocket.getInetAddress());
+            System.out.println("InetServerPort: " + serverServerSocket.getLocalPort());
+
+            Thread serverMessageThread = new Thread(new ServerMessageThread(serverServerSocket,meServer));
+            serverMessageThread.start();
             /**
              * For new connection received to the clientPort accept and create a Socket(clientSocket)
              * log client address and port for references.
@@ -95,7 +105,7 @@ public class Main {
             // start sending thread
 
             while (true) {
-                clientSocket = serverSocket.accept();
+                clientSocket = clientServerSocket.accept();
                 System.out.println("Connection received from " + clientSocket.getInetAddress().getHostName() + "to port : " + clientSocket.getPort());
                 Thread receiveThread = new Thread(new ClientMessageThread(clientSocket, clientManager,meServer));
                 receiveThread.start();

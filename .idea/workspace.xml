@@ -4,22 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9e6b1164-d98f-46b5-8ca1-9441cfb0b270" name="Changes" comment="gossip update method">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/K5s/ChatServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/K5s/ChatServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/K5s/protocol/GossipMessages.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/K5s/protocol/GossipMessages.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/ChatServer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/ClientManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/CmdValues.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/RoomManager.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/connectionManager/ClientMessageThread.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/connectionManager/ServerMessageThread.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/protocol/ServerToClientMessages.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/storage/ChatClient.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/storage/ChatRoom.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/storage/Server.class" beforeDir="false" />
+    <list default="true" id="9e6b1164-d98f-46b5-8ca1-9441cfb0b270" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/assembly-descriptor.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +33,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/pom.xml" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
   </component>
@@ -58,7 +51,18 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="terminal" />
     <property name="show.migrate.to.gradle.popup" value="false" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\Semester 7 - Moodle 2021\Distributed Systems\Project\DS_Server" />
+      <recent name="E:\Semester 7 - Moodle 2021\Distributed Systems\Project\DS_Server\src" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Semester 7 - Moodle 2021\Distributed Systems\Project\DS_Server\src\main" />
+      <recent name="E:\Semester 7 - Moodle 2021\Distributed Systems\Project\DS_Server\src" />
+    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -94,6 +98,27 @@
         </entry>
       </map>
     </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/master" />
+                </option>
+              </RecentGroup>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="master" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="gossip update method" />

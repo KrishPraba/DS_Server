@@ -1,7 +1,7 @@
 package K5s;
 
 import K5s.storage.Server;
-import org.json.JSONArray;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;

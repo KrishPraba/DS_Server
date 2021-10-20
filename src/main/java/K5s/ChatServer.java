@@ -1,17 +1,17 @@
 package K5s;
 
 import K5s.storage.Server;
+import org.json.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ChatServer extends Server {
 
     private ArrayList<Server> otherServers = new ArrayList<>();
-    private Map<String,ArrayList> globalServerState;
+    private Map<String,ArrayList<String>> globalServerState;
     private ArrayList<String> globalIdentity;
 
     /**
@@ -32,22 +32,24 @@ public class ChatServer extends Server {
      * @param gossip
      */
     public void updateState(JSONObject gossip){
-        Map<String,ArrayList<String>> state = (Map<String, ArrayList<String>>) gossip.get("serverRooms");
-        ArrayList<String > identity = (ArrayList<String>) gossip.get("identity");
+        Map<String,JSONArray> state = (Map<String, JSONArray>) gossip.get("serverRooms");
+        JSONArray identity = (JSONArray) gossip.get("identity");
 
 //        for each identity in the received gossip add them to the local identity list
-        for (String i :identity) {
-            if (!globalIdentity.contains(i)){
-                globalIdentity.add(i);
+        for (Object i :identity) {
+            String identityString= (String) i;
+            if (!globalIdentity.contains(identityString)){
+                globalIdentity.add(identityString);
             }
         }
 //        for each server's room list if the record not found in the local copy update accordingly
         state.keySet().forEach(server->{
             if (server!=this.getServerId()){
                 if(globalServerState.containsKey(server)){
-                    for (String s :state.get(server)){
-                        if (!globalServerState.get(server).contains(s)){
-                            globalServerState.get(server).add(s);
+                    for (Object s :state.get(server)){
+                        String serverString= (String) s;
+                        if (!globalServerState.get(server).contains(serverString)){
+                            globalServerState.get(server).add(serverString);
                         }
                     }
                 }
@@ -64,4 +66,17 @@ public class ChatServer extends Server {
         this.otherServers.add(server);
     }
 
+    /**
+     * get Server from serverId
+     * @param id  serverid
+     * @return Server
+     */
+    public Server getServer(String id){
+        for(Server server:otherServers){
+            if (server.getServerId().equals(id)){
+                return server;
+            }
+        }
+        return null;
+    }
 }

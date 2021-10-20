@@ -1,9 +1,12 @@
 package K5s.connectionManager;
 
+import static K5s.protocol.ServerToClientMessages.*;
+
 import K5s.ChatServer;
 import K5s.ClientManager;
 import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -17,27 +20,25 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static K5s.protocol.ServerToClientMessages.*;
-
-public class ClientMessageThread implements Runnable{
+@Slf4j
+public class ClientMessageThread implements Runnable {
     private final Socket socket;
-    private BufferedReader in;
     private final AtomicBoolean running = new AtomicBoolean(true);
-    private DataOutputStream out ;
+    private BufferedReader in;
+    private DataOutputStream out;
     private ClientManager manager;
     private JSONParser parser = new JSONParser();
     private ChatClient client;
     private ChatServer server;
 
     /**
-     *
      * @param socket the client socket maintaining the client connection
      * @throws IOException on socket failure
      */
-    public ClientMessageThread(Socket socket, ClientManager manager,ChatServer server) throws IOException {
+    public ClientMessageThread(Socket socket, ClientManager manager, ChatServer server) throws IOException {
         this.manager = manager;
         this.socket = socket;
-        this.out=new DataOutputStream(socket.getOutputStream());
+        this.out = new DataOutputStream(socket.getOutputStream());
         this.client = null;
         this.server = server;
     }
@@ -49,42 +50,52 @@ public class ClientMessageThread implements Runnable{
      */
     @Override
     public void run() {
+
         try {
+
             this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));
             JSONObject message;
-            while (this.running.get()){
+            while (this.running.get()) {
                 message = (JSONObject) parser.parse(in.readLine());
-                System.out.println("Receiving: " + message);
+                log.debug("Receiving: {}", message);
                 this.MessageReceive(message);
             }
 
             this.in.close();
             this.socket.close();
-        }  catch (IOException e) {
-            System.out.println("Communication Error: " + e.getMessage());
+
+        } catch (IOException e) {
+
+            log.error("Communication Error: {}", e.getMessage());
 
             boolean isOwner = manager.chatClientQuit(this.client);
+
             try {
-                send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
-                if (isOwner){
+
+                send(quitOwnerReply(client.getChatClientID(), client.getRoom().getRoomId()));
+                if (isOwner) {
                     manager.ownerDeleteRoom(client);
                 }
+
             } catch (IOException ex) {
-                System.out.println("Communication Error: " + ex.getMessage());
+                log.error("Communication Error: {}", ex.getMessage());
             }
 
             running.set(false);
+
         } catch (ParseException e) {
-            System.out.println("Message Error: " + e.getMessage());
+
+            log.error("Message Error: {}", e.getMessage());
 
             boolean isOwner = manager.chatClientQuit(this.client);
+
             try {
-                send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
-                if (isOwner){
+                send(quitOwnerReply(client.getChatClientID(), client.getRoom().getRoomId()));
+                if (isOwner) {
                     manager.ownerDeleteRoom(client);
                 }
             } catch (IOException ex) {
-                System.out.println("Communication Error: " + ex.getMessage());
+                log.error("Communication Error: {}", ex.getMessage());
             }
 
             running.set(false);
@@ -93,7 +104,6 @@ public class ClientMessageThread implements Runnable{
     }
 
     /**
-     *
      * @param message JSONObject receive message from the user
      * @throws IOException on socket failure
      */
@@ -101,153 +111,160 @@ public class ClientMessageThread implements Runnable{
         String type = (String) message.get("type");
         String identity;
         switch (type) {
+
+            /*
+             * for newidentity message
+             * check the server object for availability  of the identity
+             * TODO : server object should implement method to communicate with leader
+             * if the requested identity s available create new User object ,
+             * add the user to the server user list and set user to the current messageReceiveThread
+             * then create reply message using  getNewIdentityReply and send it to the user
+             * if identity is already taken then close the socket
+             */
             case "newidentity":
-                /**
-                 * for newidentity message
-                 * check the server object for availability  of the identity
-                 * TODO : server object should implement method to communicate with leader
-                 * if the requested identity s available create new User object ,
-                 * add the user to the server user list and set user to the current messageReceiveThread
-                 * then create reply message using  getNewIdentityReply and send it to the user
-                 * if identity is already taken then close the socket
-                 */
+
                 identity = (String) message.get("identity");
-                this.client = manager.newIdentity(identity,this);
-                if (this.client != null){
-                    send(getNewIdentityReply(identity,true));
+                this.client = manager.newIdentity(identity, this);
+
+                if (this.client != null) {
+                    send(getNewIdentityReply(identity, true));
                     manager.sendMainhallBroadcast(this.client);
-                }
-                else{
-                    send(getNewIdentityReply(identity,false));
+                } else {
+                    send(getNewIdentityReply(identity, false));
                     this.in.close();
                     socket.close();
                 }
+
                 break;
+
+            /*
+             * for incoming messages
+             * get the current user bind to the thread and there room , then if the room is not the main room
+             * ( ie: he/she is not in the main room )  broadcast the received message by
+             * calling the broadcastMessage function from respective room
+             * here the identity key is check because type "message" is used to send the broadcast message with the identity
+             * if identity key is available then it is a broadcast message send by the Room
+             * else it is a message received from the client
+             */
             case "message":
-                /**
-                 * for incoming messages
-                 * get the current user bind to the thread and there room , then if the room is not the main room
-                 * ( ie: he/she is not in the main room )  broadcast the received message by
-                 * calling the broadcastMessage function from respective room
-                 * here the identity key is check because type "message" is used to send the broadcast message with the identity
-                 * if identity key is available then it is a broadcast message send by the Room
-                 * else it is a message received from the client
-                 */
                 String m = (String) message.get("content");
                 if (message.containsKey("identity")) {
                     send(message);
+                } else {
+                    manager.sendMessage(m, this.client);
                 }
-                else{
-                    manager.sendMessage(m,this.client);
-                }
-
                 break;
+
+            /*
+             * get existing roomIds by calling getRoomIds method of current server
+             * TODO :this method need to be updated to return all the rooms in the entire system
+             */
             case "list":
-                /**
-                 * get existing roomIds by calling getRoomIds method of current server
-                 * TODO :this method need to be updated to return all the rooms in the entire system
-                 */
                 ArrayList<String> roomIds = manager.listRoomIds();
                 send(getListReply(roomIds));
                 break;
+
+            /*
+             * replies with the current users in the same room as the user
+             */
             case "who":
-                /**
-                 * replies with the current users in the same room as the user
-                 */
                 JSONObject reply = manager.listRoomDetails(this.client);
                 send(reply);
                 break;
+
+            /*
+             * when createroom message is received the system will check
+             * whether the roomid is already taken by calling thisServer isRoomAvailableToCreate method
+             * if available and the user is not owner of any other room create new room and add to the server and gossip
+             * and send success  message to user and move him/her to the room and
+             * broadcast roomChange message to the respective rooms
+             * Else send fail message to the user
+             * TODO : inform other servers the creation of new room
+             */
             case "createroom":
-                /**
-                 * when createroom message is received the system will check
-                 * whether the roomid is already taken by calling thisServer isRoomAvailableToCreate method
-                 * if available and the user is not owner of any other room create new room and add to the server and gossip
-                 * and send success  message to user and move him/her to the room and
-                 * broadcast roomChange message to the respective rooms
-                 * Else send fail message to the user
-                 * TODO : inform other servers the creation of new room
-                 */
                 String cid = (String) message.get("roomid");
                 ChatRoom room = manager.createRoom(this.client, cid);
-                if ((this.client != null) && (room != null)){
-                    send(getCreateRoomReply(cid,true));
+                if ((this.client != null) && (room != null)) {
+                    send(getCreateRoomReply(cid, true));
                     manager.sendRoomCreateBroadcast(client, room);
-                    }
-                else{
-                    send(getCreateRoomReply(cid,false));
+                } else {
+                    send(getCreateRoomReply(cid, false));
                 }
                 break;
 
+            /*
+             * if the requested user already in a room and he is the owner of that room send a failure message
+             * else check if the current server has this Room
+             * if it exists call user joinroom methode to move him to that room.
+             * else check TODO: whether other servers has that room ,
+             * if so then TODO : send a route message
+             * else send a fail message
+             */
             case "joinroom":
-                /**
-                 * if the requested user already in a room and he is the owner of that room send a failure message
-                 * else check if the current server has this Room
-                 * if it exists call user joinroom methode to move him to that room.
-                 * else check TODO: whether other servers has that room ,
-                 * if so then TODO : send a route message
-                 * else send a fail message
-                 */
                 String jrid = (String) message.get("roomid");
-                boolean success = manager.joinRoom(this.client,jrid);
-                if(!success){
-                    send(getRoomChangeBroadcast(this.client.getChatClientID(),jrid,jrid));
+                boolean success = manager.joinRoom(this.client, jrid);
+                if (!success) {
+                    send(getRoomChangeBroadcast(this.client.getChatClientID(), jrid, jrid));
                 }
                 break;
+
             case "movejoin":
                 String joinRoomid = (String) message.get("roomid");
                 String formerRoomid = (String) message.get("former");
                 String clientIdentity = (String) message.get("identity");
 
                 boolean isServerChange = manager.moveJoinRoom(clientIdentity, joinRoomid, this, formerRoomid);
-                if(isServerChange){
-                    send(getMoveJoinReply(clientIdentity,true,this.server.getServerId()));
+                if (isServerChange) {
+                    send(getMoveJoinReply(clientIdentity, true, this.server.getServerId()));
                 }
 
                 break;
+
+            /*
+             * TODO : inform other servers of room deletion
+             */
             case "deleteroom":
-                /**
-                 * TODO : inform other servers of room deletion
-                 */
                 String rid = (String) message.get("roomid");
-                boolean isApproved = manager.clientDeleteRoom(this.client,rid);
-                if (isApproved){
-                    send(getDeleteRoomRequest(rid,true));
-                }
-                else{
-                    send(getDeleteRoomRequest(rid,false));
+                boolean isApproved = manager.clientDeleteRoom(this.client, rid);
+                if (isApproved) {
+                    send(getDeleteRoomRequest(rid, true));
+                } else {
+                    send(getDeleteRoomRequest(rid, false));
                 }
                 break;
+
+            /*
+             * broadcasting room change messages
+             */
             case "roomchange":
-                /**
-                 * broadcasting room change messages
-                 */
                 send(message);
                 break;
+
+            /*
+             * TODO : inform other servers of room deletion is user is room owner
+             */
             case "quit":
-                /**
-                 * TODO : inform other servers of room deletion is user is room owner
-                 */
                 boolean isOwner = manager.chatClientQuit(this.client);
                 try {
-                    send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
-                    if (isOwner){
+                    send(quitOwnerReply(client.getChatClientID(), client.getRoom().getRoomId()));
+                    if (isOwner) {
                         manager.ownerDeleteRoom(client);
                     }
                 } catch (IOException ex) {
-                    System.out.println("Communication Error: " + ex.getMessage());
+                    log.error("Communication Error: {}", ex.getMessage());
                 }
+
             default:
-                System.out.println(message + "not configured");
+                log.info("{} not configured", message);
         }
     }
 
     /**
-     *
      * @param obj JSONObject to be written to the OutputStream of the socket
      * @throws IOException on socket failure
      */
     private void send(JSONObject obj) throws IOException {
-        System.out.println("Reply :" + obj );
+        log.debug("Reply : {}", obj);
         out.write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
         out.flush();
     }

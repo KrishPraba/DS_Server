@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9e6b1164-d98f-46b5-8ca1-9441cfb0b270" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/assembly-descriptor.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+    <list default="true" id="9e6b1164-d98f-46b5-8ca1-9441cfb0b270" name="Changes" comment="ran default formatter. changed print statements to logging.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/K5s/connectionManager/ServerMessageThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/K5s/connectionManager/ServerMessageThread.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,12 +44,16 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SONARLINT_PRECOMMIT_ANALYSIS" value="false" />
     <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="terminal" />
     <property name="show.migrate.to.gradle.popup" value="false" />
+  </component>
+  <component name="ReaderModeSettings">
+    <option name="showRenderedDocs" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -74,6 +75,42 @@
       <updated>1634664742247</updated>
       <workItem from="1634664744744" duration="1850000" />
     </task>
+    <task id="LOCAL-00001" summary="groupId, artifactId changed in accordance with specifications in `CS4262 - Group Project`.&#10;&#10;encoding added, version grouped.&#10;&#10;added new dependencies. testing dependencies will be removed if not useful.&#10;&#10;added build config: `assembly-descriptor.xml`">
+      <created>1634731923047</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1634731923047</updated>
+    </task>
+    <task id="LOCAL-00002" summary="switched from `servers.txt` to `config.properties`. `servers.txt` will be removed when possible.&#10;&#10;gitignore has little refactoring">
+      <created>1634732056454</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1634732056454</updated>
+    </task>
+    <task id="LOCAL-00003" summary="`Main.java` to supervise and run tests. This is just a skeleton. Will be filled with test classes when they are added.">
+      <created>1634732119284</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1634732119284</updated>
+    </task>
+    <task id="LOCAL-00004" summary="these are just `.idea` files. Just go ahead and commit them. `.idea` will be ignored in future events anyways">
+      <created>1634732176764</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1634732176764</updated>
+    </task>
+    <task id="LOCAL-00005" summary="ran default formatter. changed print statements to logging.">
+      <created>1634733173991</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1634733173991</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -122,6 +159,11 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="gossip update method" />
-    <option name="LAST_COMMIT_MESSAGE" value="gossip update method" />
+    <MESSAGE value="groupId, artifactId changed in accordance with specifications in `CS4262 - Group Project`.&#10;&#10;encoding added, version grouped.&#10;&#10;added new dependencies. testing dependencies will be removed if not useful.&#10;&#10;added build config: `assembly-descriptor.xml`" />
+    <MESSAGE value="switched from `servers.txt` to `config.properties`. `servers.txt` will be removed when possible.&#10;&#10;gitignore has little refactoring" />
+    <MESSAGE value="`Main.java` to supervise and run tests. This is just a skeleton. Will be filled with test classes when they are added." />
+    <MESSAGE value="these are just `.idea` files. Just go ahead and commit them. `.idea` will be ignored in future events anyways" />
+    <MESSAGE value="ran default formatter. changed print statements to logging." />
+    <option name="LAST_COMMIT_MESSAGE" value="ran default formatter. changed print statements to logging." />
   </component>
 </project>

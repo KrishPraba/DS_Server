@@ -85,9 +85,7 @@ public class Server {
         return serverServerSocket;
     }
     public Socket getSocket() throws IOException {
-        if (socket==null){
-            this.socket=new Socket(this.ipAddress, this.getCoordinationPort());
-        }
+        this.socket=new Socket(this.ipAddress, this.getCoordinationPort());
         return socket;
     }
 

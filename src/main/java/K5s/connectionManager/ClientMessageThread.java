@@ -112,16 +112,24 @@ public class ClientMessageThread implements Runnable{
                  * if identity is already taken then close the socket
                  */
                 identity = (String) message.get("identity");
-                this.client = manager.newIdentity(identity,this);
-                if (this.client != null){
-                    send(getNewIdentityReply(identity,true));
-                    manager.sendMainhallBroadcast(this.client);
-                }
-                else{
+
+                if(server.getElectionInProgress()){
                     send(getNewIdentityReply(identity,false));
                     this.in.close();
                     socket.close();
+                } else {
+                    this.client = manager.newIdentity(identity,this);
+                    if (this.client != null){
+                        send(getNewIdentityReply(identity,true));
+                        manager.sendMainhallBroadcast(this.client);
+                    }
+                    else{
+                        send(getNewIdentityReply(identity,false));
+                        this.in.close();
+                        socket.close();
+                    }
                 }
+
                 break;
             case "message":
                 /**
@@ -168,14 +176,19 @@ public class ClientMessageThread implements Runnable{
                  * TODO : inform other servers the creation of new room
                  */
                 String cid = (String) message.get("roomid");
-                ChatRoom room = manager.createRoom(this.client, cid);
-                if ((this.client != null) && (room != null)){
-                    send(getCreateRoomReply(cid,true));
-                    manager.sendRoomCreateBroadcast(client, room);
-                    }
-                else{
+                if(server.getElectionInProgress()){
                     send(getCreateRoomReply(cid,false));
+                } else {
+                    ChatRoom room = manager.createRoom(this.client, cid);
+                    if ((this.client != null) && (room != null)){
+                        send(getCreateRoomReply(cid,true));
+                        manager.sendRoomCreateBroadcast(client, room);
+                    }
+                    else{
+                        send(getCreateRoomReply(cid,false));
+                    }
                 }
+
                 break;
 
             case "joinroom":

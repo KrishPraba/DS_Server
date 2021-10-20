@@ -4,15 +4,22 @@ import K5s.storage.Server;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static K5s.protocol.LeaderProtocol.coordinatorMessage;
+import static K5s.protocol.LeaderProtocol.electionMessage;
 
 public class ChatServer extends Server {
 
     private ArrayList<Server> otherServers = new ArrayList<>();
     private Map<String,ArrayList<String>> globalServerState;
     private ArrayList<String> globalIdentity;
+    private boolean isLeader = false;
+    private String leader;
+    private boolean electionInProgress = false;
 
     /**
      * @param serverId         serverID
@@ -78,5 +85,28 @@ public class ChatServer extends Server {
             }
         }
         return null;
+    }
+
+    public ArrayList<Server> getOtherServers(){
+        return this.otherServers;
+    }
+
+    public void setLeader(String serverId){
+        if (serverId.compareTo(this.getServerId()) == 0){
+            this.isLeader = true;
+        }
+        this.leader = serverId;
+    }
+
+    public boolean checkLeader(){
+        return this.isLeader;
+    }
+
+    public void setElectionInProgress(boolean x){
+        this.electionInProgress = x;
+    }
+
+    public boolean getElectionInProgress(){
+        return this.electionInProgress;
     }
 }

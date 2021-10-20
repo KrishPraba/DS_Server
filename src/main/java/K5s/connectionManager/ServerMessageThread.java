@@ -7,13 +7,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,12 +19,13 @@ import static K5s.protocol.GossipMessages.gossipMessage;
 import static K5s.protocol.LeaderProtocol.*;
 
 public class ServerMessageThread implements Runnable{
+
     private ServerSocket serverServerSocket;
     private final ChatServer meServer;
     private BufferedReader in;
     private JSONParser parser = new JSONParser();
     private final AtomicBoolean running=new AtomicBoolean(true);
-    private DataOutputStream out;
+//    private DataOutputStream out;
 
 
     public ServerMessageThread(ServerSocket serverServerSocket, ChatServer meServer) throws IOException {
@@ -36,17 +35,21 @@ public class ServerMessageThread implements Runnable{
     @Override
     public void run() {
         try {
-            while (true){
+            initiateLeaderElection();
+            while (this.running.get()){
                 Socket serverSocket = serverServerSocket.accept();
                 System.out.println("Connection received from Server" + serverSocket.getInetAddress().getHostName() + "to port : " + serverSocket.getPort());
+
                 this.in=new BufferedReader(new InputStreamReader(serverSocket.getInputStream(),StandardCharsets.UTF_8));
                 JSONObject message;
-                while (this.running.get()){
-                    message=(JSONObject) parser.parse(this.in.readLine());
-                    System.out.println("Receiving Client Message: " + message);
-                    MessageReceive(message);
+                message=(JSONObject) parser.parse(in.readLine());
+                System.out.println("Receiving Server Message: " + message);
+                MessageReceive(message);
                 }
-            }
+                this.in.close();
+//                System.out.println("socket closed");
+//                this.serverServerSocket.close();
+//            }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -54,28 +57,49 @@ public class ServerMessageThread implements Runnable{
     private  void MessageReceive(JSONObject message) throws IOException {
         String type = (String) message.get("type");
         String kind =(String) message.get("kind");
+//        System.out.println(kind);
         switch (type){
             case "bully":
                 String serverId = (String) message.get("serverid");
                 switch (kind) {
                     case "ELECTION":
-//                        if (serverId.hashCode()<meServer.getServerId().hashCode()) {
-//                            send(getOkMessage(meServer.getServerId()));
-//                        }
-//                        break;
-                    case "COORDINATOR":
-//                        if (serverId.hashCode()> meServer.getServerId().hashCode()){
-//                            Leader.setLeader(meServer.getServer(serverId));
-//                        }
-//                        else{
-//                            send(getCoordinatorMessage(meServer.getServerId()));
-//                        }
-//                        break;
-                    case "OK":
+
+                        if (serverId.compareTo(meServer.getServerId()) < 0){
+                            try{
+                                send(okMessage(meServer.getServerId()), serverId);
+                                if(meServer.checkLeader()){
+                                    send(coordinatorMessage(meServer.getServerId()), serverId);
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                System.out.println("Server " + serverId + "is down");
+                            }
+                        } else {
+                            initiateLeaderElection();
+                        }
+
                         break;
+
+                    case "COORDINATOR":
+                        if (serverId.compareTo(meServer.getServerId()) < 0){
+                            initiateLeaderElection();
+                        } else{
+                            meServer.setLeader(serverId);
+                            meServer.setElectionInProgress(false);
+                            System.out.println(serverId+ " has been elected as Leader.");
+                        }
+
+                        break;
+
+                    case "OK":
+                        System.out.println("OK received from "+serverId);
+                        meServer.setElectionInProgress(true);
+                        break;
+
                     default:
-                        System.out.println(message + "not configured");
+                        System.out.println(message + " not configured");
                 }
+                break;
             case "gossip":
                 switch (kind){
                     case "stateUpdate":
@@ -94,17 +118,58 @@ public class ServerMessageThread implements Runnable{
                     default:
                         System.out.println(message + "not configured");
                 }
+                break;
             default:
                 System.out.println(message + "not configured");
         }
     }
     private void send(JSONObject obj,String serverId) throws IOException {
-        System.out.println("Reply :" + obj );
         Server server=meServer.getServer(serverId);
+//        DataOutputStream out;
         if (server!=null){
-            server.getSocket().getOutputStream().write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
+            System.out.println("server configured");
+            Socket ss=server.getSocket();
+            System.out.println(ss.getPort());
+            OutputStream out = ss.getOutputStream();
+            out.write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
+            out.flush();
+            out.close();
         }
-        out.flush();
-        out.close();
+        System.out.println("Reply :" + obj );
+
+//        out.flush();
+//        out.close();
+    }
+
+    public void initiateLeaderElection(){
+        meServer.setElectionInProgress(true);
+        ArrayList<Server> otherServers = meServer.getOtherServers();
+        int count = 0;
+        for(Server s : otherServers){
+            if (s.getServerId().compareTo(meServer.getServerId()) > 0){
+                try{
+                    send(electionMessage(meServer.getServerId()), s.getServerId());
+                    count += 1;
+                }catch(IOException e){
+                    System.out.println("Server "+s.getServerId()+ "is down");
+                }
+            }
+        }
+
+        if(count == 0){
+
+            for (Server s: otherServers) {
+                try{
+                    send(coordinatorMessage(meServer.getServerId()), s.getServerId());
+                } catch(IOException e) {
+                    System.out.println("Server "+s.getServerId()+ " is down");
+                }
+            }
+
+            meServer.setLeader(meServer.getServerId());
+            meServer.setElectionInProgress(false);
+            System.out.println(meServer.getServerId()+ " is Leader");
+        }
+
     }
 }

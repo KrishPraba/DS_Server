@@ -49,7 +49,6 @@ public class Main {
 
                 if (split[0].equalsIgnoreCase(serverid)){
                     meServer  =new ChatServer(split[0],split[1],Integer.parseInt(split[2]),Integer.parseInt(split[3]));
-                    servers.add(meServer);
                 }else{
                     servers.add(new Server(split[0],split[1],Integer.parseInt(split[2]),Integer.parseInt(split[3])));
                 }

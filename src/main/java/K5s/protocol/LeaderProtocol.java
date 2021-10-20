@@ -22,7 +22,7 @@ public class LeaderProtocol {
      * @param serverid current serverId
      * @return   JSONObject
      */
-    public static JSONObject getElectionMessage( String serverid) {
+    public static JSONObject electionMessage(String serverid) {
         JSONObject leader = new JSONObject();
         leader.put("type", "bully");
         leader.put("kind", "ELECTION");
@@ -37,7 +37,7 @@ public class LeaderProtocol {
      * @param serverid current serverId
      * @return   JSONObject
      */
-    public static JSONObject getOkMessage( String serverid) {
+    public static JSONObject okMessage( String serverid) {
         JSONObject leader = new JSONObject();
         leader.put("type", "bully");
         leader.put("kind", "OK");
@@ -51,7 +51,7 @@ public class LeaderProtocol {
      * @param serverid current serverId
      * @return   JSONObject
      */
-    public static JSONObject getCoordinatorMessage( String serverid) {
+    public static JSONObject coordinatorMessage( String serverid) {
         JSONObject leader = new JSONObject();
         leader.put("type", "bully");
         leader.put("kind", "COORDINATOR");
@@ -68,7 +68,7 @@ public class LeaderProtocol {
      * @param identity user identity to be checked
      * @return      JSONObject
      */
-    public static JSONObject getNewtIdentityApprovalRequest( String serverid,String identity) {
+    public static JSONObject newtIdentityApprovalRequest( String serverid,String identity) {
         JSONObject leader = new JSONObject();
         leader.put("type", "requestIdentityApproval");
         leader.put("serverid", serverid);
@@ -82,7 +82,7 @@ public class LeaderProtocol {
      * @param identity user identity to be checked
      * @return JSONObject
      */
-    public static JSONObject getNewtIdentityApprovalReply( String approved,String identity) {
+    public static JSONObject newtIdentityApprovalReply( String approved,String identity) {
         JSONObject leader = new JSONObject();
         leader.put("type", "confirmIdentity");
         leader.put("approved", approved);
@@ -98,7 +98,7 @@ public class LeaderProtocol {
      * @param identity identity
      * @return      JSONObject
      */
-    public static JSONObject getNewtRoomIdApprovalRequest( String roomid,String identity) {
+    public static JSONObject newtRoomIdApprovalRequest( String roomid,String identity) {
         JSONObject leader = new JSONObject();
         leader.put("type", "requestRoomIDApproval");
         leader.put("roomid", roomid);
@@ -112,7 +112,7 @@ public class LeaderProtocol {
      * @param roomid    roomid of the request
      * @return      JSONObject
      */
-    public static JSONObject getNewtRoomIdApprovalReply( String approved,String roomid) {
+    public static JSONObject newtRoomIdApprovalReply( String approved,String roomid) {
         JSONObject leader = new JSONObject();
         leader.put("type", "confirmRoomID");
         leader.put("approved", approved);

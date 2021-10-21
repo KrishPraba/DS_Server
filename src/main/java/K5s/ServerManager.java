@@ -18,27 +18,36 @@ public class ServerManager {
     private ServerManager(ChatServer meServer){
         this.meServer=meServer;
     }
-    public static boolean isAvailableIdentity(String identity){
+
+    /**
+     * returns true if the identity might get approved else false
+     * @param identity
+     * @return
+     */
+    public static String  isAvailableIdentity(String identity){
         if(meServer.getGlobalIdentity().contains(identity)){
-            return false;
+            return "FALSE";
         }else {
-            if (meServer.isLeader()){
+            System.out.println("this server is leader : "+meServer.isLeader()+" "+meServer.getLeader());
+            if (!meServer.isLeader()){
                 JSONObject newtIdentityApprovalRequest = newtIdentityApprovalRequest(meServer.getServerId(),identity);
                 if(!meServer.getLeader().isEmpty()){
                     try {
                         send(newtIdentityApprovalRequest,meServer.getLeader());
-                        return true;
+                        return "WAITING";
                     } catch (IOException e) {
                         e.printStackTrace();
-                        return false;
+                        return "FALSE";
                         //this it just an availability measure
                     }
                 }else {
 //                    TODO:electionmessage
                 }
+            }else {
+                return "TRUE";
             }
         }
-        return false;
+        return "FALSE";
     }
 
     public static ServerManager getInstance(ChatServer meserver){

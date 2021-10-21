@@ -125,6 +125,7 @@ public class ChatServer extends Server {
             this.isLeader = true;
         }
         this.leader = serverId;
+        System.out.println(serverId+" is the leader and "+this.getServerId() +" is Leader : " +isLeader());
     }
 
     public boolean checkLeader(){

@@ -6,7 +6,9 @@ import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
 import org.json.simple.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static K5s.protocol.ServerToClientMessages.*;
@@ -20,53 +22,77 @@ public class ClientManager {
     public ClientManager(RoomManager manager){
         chatClients = new ArrayList<>();
         this.roomManager = manager;
+        identitySubscribers=new HashMap<>();
 
     }
 
     public synchronized boolean newIdentity(String identity, ClientMessageThread clientMessageThread){
 
-        if (isAvailableIdentity(identity ,clientMessageThread)) {
-            System.out.println("User waiting for approval.");
-            return true;
-//            ChatClient user = new ChatClient(identity, clientMessageThread);
-//            chatClients.add(user);
-//            user.setRoom(roomManager.getMainHall());
-//            roomManager.addToMainHall(user);
-//            return user;
-        } else {
-            System.out.println(identity + " already in use.");
-            return false;
+        switch (isAvailableIdentity(identity ,clientMessageThread)) {
+            case "WAITING":
+                System.out.println("User waiting for approval.");
+                return true;
+            case "FALSE":
+                System.out.println(identity + " already in use.");
+                return false;
+            case "TRUE":
+                replyIdentityRequest(identity,true);
+                return true;
+            default:
+                System.out.println("Invalid case");
+                return false;
         }
     }
     public static void replyIdentityRequest(String identity,boolean approved){
         if(identitySubscribers.containsKey(identity)){
-            System.out.println("User has been approved.");
-            ClientMessageThread clientMessageThread=identitySubscribers.get(identity);
-            ChatClient user = new ChatClient(identity,clientMessageThread );
-            chatClients.add(user);
-            user.setRoom(roomManager.getMainHall());
-            roomManager.addToMainHall(user);
-            clientMessageThread.setClient(user);
-            sendMainhallBroadcast(user);
-            identitySubscribers.remove(identity);
+            if (approved) {
+                System.out.println("User has been approved.");
+                ClientMessageThread clientMessageThread = identitySubscribers.get(identity);
+                ChatClient user = new ChatClient(identity, clientMessageThread);
+                chatClients.add(user);
+                user.setRoom(roomManager.getMainHall());
+                roomManager.addToMainHall(user);
+                clientMessageThread.setClient(user);
+                sendMainhallBroadcast(user);
+                identitySubscribers.remove(identity);
+            }else {
+                System.out.println("User request declined.");
+                ClientMessageThread clientMessageThread = identitySubscribers.get(identity);
+                identitySubscribers.remove(identity);
+                try {
+                    clientMessageThread.send(getNewIdentityReply(identity,false));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
         }else{
             //server detected timeout and reply to the client that identity not available to ensure availability
 //            TODO:inform leader to delete the approved identity
         }
 
     }
-    public synchronized boolean isAvailableIdentity(String identity,ClientMessageThread clientMessageThread) {
+    public synchronized String isAvailableIdentity(String identity,ClientMessageThread clientMessageThread) {
         for (ChatClient u : chatClients) {
             if (u.getChatClientID().equalsIgnoreCase(identity)) {
-                return false;
+                return "FALSE";
             }
         }
-
-        if(ServerManager.isAvailableIdentity(identity)){
-            identitySubscribers.put(identity,clientMessageThread);
-            return true;
-        }else {
-            return false;
+        switch (ServerManager.isAvailableIdentity(identity)) {
+            case "WAITING":
+                System.out.println("WAITING");
+                identitySubscribers.put(identity, clientMessageThread);
+                return "WAITING";
+            case "FALSE":
+                System.out.println("FALSE");
+                return "FALSE";
+            case "TRUE":
+                System.out.println("TRUE");
+                identitySubscribers.put(identity, clientMessageThread);
+                return "TRUE";
+            default:
+                System.out.println("Invalid case");
+                return "FALSE";
         }
     }
 
@@ -167,9 +193,14 @@ public class ClientManager {
     }
 
     public synchronized boolean chatClientQuit(ChatClient client){
-        chatClients.remove(client);
-        boolean isOwner = roomManager.removeUserFromChatRoom(client);
-        return isOwner;
+        if (client!=null){
+            chatClients.remove(client);
+            boolean isOwner = roomManager.removeUserFromChatRoom(client);
+            return isOwner;
+        }
+        return false;
+
+
     }
 
     public synchronized void ownerDeleteRoom(ChatClient client){

@@ -112,14 +112,23 @@ public class ServerMessageThread implements Runnable{
                         JSONObject state = (JSONObject) message.get("state");
                         meServer.updateState(state);
                         JSONArray neighbour=(JSONArray) message.get("gossipServerList");
-                        System.out.print("List of gossipServerList rooms:");
+                        System.out.print("List of gossipServerList rooms:" +neighbour);
                         neighbour.remove(meServer.getServerId());
                         for (int i = 0; i < neighbour.size(); i++) {
                             System.out.print(" " + neighbour.get(i));
                         }
                         String gossipNeighbour= (String) neighbour.get(new Random().nextInt(neighbour.size()));
-                        gossipMessage(state,neighbour);
-                        send(message,gossipNeighbour);
+                        message = gossipMessage(state,neighbour);
+                        try {
+                            send(message,gossipNeighbour);
+                        }catch (IOException ex){
+                            gossipNeighbour= (String) neighbour.get(new Random().nextInt(neighbour.size()));
+                            try {
+                                send(message, gossipNeighbour);
+                            }catch (IOException e){
+//                                TODO :report server failure
+                            }
+                        }
                         break;
                     default:
                         System.out.println(message + "not configured");
@@ -127,18 +136,28 @@ public class ServerMessageThread implements Runnable{
                 break;
             case "confirmIdentity":
                 String identity = (String) message.get("identity");
+                System.out.println("received confirm identity for : "+identity+" from leader");
                 boolean approved = (boolean) message.get("approved");
                 ClientManager.replyIdentityRequest(identity,approved);
                 break;
             case "requestIdentityApproval":
                 String i = (String) message.get("identity");
                 String serverid = (String) message.get("serverid");
-                if(meServer.getGlobalIdentity().contains(serverid)){
+                System.out.println("received identity approval req for : "+i+" from server : "+serverid);
+                if(meServer.getGlobalIdentity().contains(i)){
                     //Assumption : this case message will only be received by leader.
                     send(newIdentityApprovalReply(false,i),serverid);
                 }else{
                     send(newIdentityApprovalReply(true,i),serverid);
-                    send(gossipMessage(meServer.getState(), meServer.getOtherServerIdJSONArray()),meServer.getRandomeNeighbour());
+                    try {
+                        send(gossipMessage(meServer.getState(), meServer.getOtherServerIdJSONArray()), meServer.getRandomeNeighbour());
+                    } catch (IOException e){
+                        try {
+                            send(gossipMessage(meServer.getState(), meServer.getOtherServerIdJSONArray()), meServer.getRandomeNeighbour());
+                        }catch (IOException ioException){
+//                            TODO :detect failure
+                        }
+                    }
 //                    TODO:update Leader state and the methode updates the leader state should initiate the gossip
                 }
             default:
@@ -153,7 +172,7 @@ public class ServerMessageThread implements Runnable{
             OutputStream out = ss.getOutputStream();
             out.write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
             out.flush();
-            out.close();
+//            out.close();
         }
         System.out.println("Reply :" + obj );
 

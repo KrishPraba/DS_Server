@@ -20,6 +20,7 @@ public class ChatServer extends Server {
     private boolean isLeader = false;
     private String leader;
     private boolean electionInProgress = false;
+    private boolean isPossibleLeader =false;
 
     /**
      * @param serverId         serverID
@@ -108,5 +109,13 @@ public class ChatServer extends Server {
 
     public boolean getElectionInProgress(){
         return this.electionInProgress;
+    }
+
+    public boolean isPossibleLeader() {
+        return isPossibleLeader;
+    }
+
+    public void setIsPossibleLeader(boolean x){
+        this.isPossibleLeader = x;
     }
 }

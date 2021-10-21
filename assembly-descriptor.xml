@@ -8,6 +8,12 @@
     </formats>
 
     <includeBaseDirectory>false</includeBaseDirectory>
+    <files>
+        <file>
+            <source>client.jar</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+    </files>
     <fileSets>
         <fileSet>
             <directory>src/main/resources</directory>

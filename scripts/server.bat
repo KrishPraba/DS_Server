@@ -1,0 +1,1 @@
+java -jar server.jar -p "./config/servers.txt" -s "s1"

@@ -183,15 +183,17 @@ public class ClientMessageThread implements Runnable{
                  * TODO : inform other servers the creation of new room
                  */
                 String cid = (String) message.get("roomid");
+
                 if(server.getElectionInProgress()){
+                    System.out.println("Identity declined since election in progress");
                     send(getCreateRoomReply(cid,false));
                 } else {
-                    ChatRoom room = manager.createRoom(this.client, cid);
-                    if ((this.client != null) && (room != null)){
-                        send(getCreateRoomReply(cid,true));
-                        manager.sendRoomCreateBroadcast(client, room);
-                    }
-                    else{
+                    ChatClient crClient= this.client;
+                    if (manager.newRoom(cid,crClient)){
+                        System.out.println("User waiting for leader approval (RoomId) or got approved");
+//                            clientManager has replied already
+                    }else{
+                        System.out.println("leader declined.");
                         send(getCreateRoomReply(cid,false));
                     }
                 }

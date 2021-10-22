@@ -41,7 +41,12 @@ public class ClientMessageThread implements Runnable{
         this.client = null;
         this.server = server;
     }
-
+    public ChatClient getClient(){
+        return client;
+    }
+    public void setClient(ChatClient client){
+        this.client=client;
+    }
     /**
      * create a new BufferReader to read TCP inputStream to the socket specified
      * wait on the BufferReader for new messages ,parse them and pass them to MessageReceive method
@@ -71,6 +76,9 @@ public class ClientMessageThread implements Runnable{
                 }
             } catch (IOException ex) {
                 System.out.println("Communication Error: " + ex.getMessage());
+            } catch (NullPointerException ex){
+
+                e.printStackTrace();
             }
 
             running.set(false);
@@ -114,16 +122,16 @@ public class ClientMessageThread implements Runnable{
                 identity = (String) message.get("identity");
 
                 if(server.getElectionInProgress()){
+                    System.out.println("Identity declined since election in progress");
                     send(getNewIdentityReply(identity,false));
                     this.in.close();
                     socket.close();
                 } else {
-                    this.client = manager.newIdentity(identity,this);
-                    if (this.client != null){
-                        send(getNewIdentityReply(identity,true));
-                        manager.sendMainhallBroadcast(this.client);
-                    }
-                    else{
+                    if (manager.newIdentity(identity,this) ) {
+                        System.out.println("User waiting for leader approval or got approved");
+//                            clientManager has replied already
+                    }else{
+                        System.out.println("leader declined.");
                         send(getNewIdentityReply(identity,false));
                         this.in.close();
                         socket.close();
@@ -211,10 +219,10 @@ public class ClientMessageThread implements Runnable{
                 String formerRoomid = (String) message.get("former");
                 String clientIdentity = (String) message.get("identity");
 
-                boolean isServerChange = manager.moveJoinRoom(clientIdentity, joinRoomid, this, formerRoomid);
-                if(isServerChange){
-                    send(getMoveJoinReply(clientIdentity,true,this.server.getServerId()));
-                }
+                manager.moveJoinRoom(clientIdentity, joinRoomid, this, formerRoomid);
+//                if(!isServerChange){
+//                    send(getMoveJoinReply(clientIdentity,true,this.server.getServerId()));
+//                }
 
                 break;
             case "deleteroom":
@@ -259,10 +267,13 @@ public class ClientMessageThread implements Runnable{
      * @param obj JSONObject to be written to the OutputStream of the socket
      * @throws IOException on socket failure
      */
-    private void send(JSONObject obj) throws IOException {
+    public void send(JSONObject obj) throws IOException {
         System.out.println("Reply :" + obj );
         out.write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
         out.flush();
+        if (client==null){
+            this.running.set(false);
+        }
     }
 
 }

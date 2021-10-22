@@ -82,7 +82,7 @@ public class LeaderProtocol {
      * @param identity user identity to be checked
      * @return JSONObject
      */
-    public static JSONObject newtIdentityApprovalReply( String approved,String identity) {
+    public static JSONObject newIdentityApprovalReply(boolean approved, String identity) {
         JSONObject leader = new JSONObject();
         leader.put("type", "confirmIdentity");
         leader.put("approved", approved);

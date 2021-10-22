@@ -14,16 +14,19 @@ public class RoomManager {
 
     private ArrayList<ChatRoom> chatRooms;
     private ChatRoom mainHall;
-    private Server meserver;
+    private ChatServer meserver;
 
-    public RoomManager(Server meserver){
+    public RoomManager(ChatServer meserver){
         this.mainHall = new ChatRoom("MainHall-s1",meserver.getServerId() );
         this.chatRooms = new ArrayList<>();
         chatRooms.add(this.mainHall);
+        this.meserver=meserver;
+//        TODO:add mainhall to global roomlist
     }
 
     public synchronized void addToMainHall(ChatClient client){
         this.mainHall.addMember(client);
+        this.meserver.addNewIdentity(client.getChatClientID());
     }
 
     public ChatRoom getMainHall(){ return this.mainHall;}

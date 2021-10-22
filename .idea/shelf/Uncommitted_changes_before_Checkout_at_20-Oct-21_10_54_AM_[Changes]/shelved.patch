@@ -1,0 +1,196 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"9e6b1164-d98f-46b5-8ca1-9441cfb0b270\" name=\"Changes\" comment=\"gossip update method\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/.gitignore\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/vcs.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/vcs.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/K5s/ChatServer.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/K5s/ChatServer.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/K5s/protocol/GossipMessages.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/K5s/protocol/GossipMessages.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/ChatServer.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/ClientManager.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/CmdValues.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/Main.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/RoomManager.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/connectionManager/ClientMessageThread.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/connectionManager/ServerMessageThread.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/protocol/ServerToClientMessages.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/storage/ChatClient.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/storage/ChatRoom.class\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/target/classes/K5s/storage/Server.class\" beforeDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"ChangesViewManager\">\r\n    <option name=\"groupingKeys\">\r\n      <option value=\"directory\" />\r\n    </option>\r\n  </component>\r\n  <component name=\"CodeStyleSettingsInfer\">\r\n    <option name=\"done\" value=\"true\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"master\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n    <option name=\"UPDATE_TYPE\" value=\"REBASE\" />\r\n  </component>\r\n  <component name=\"ProjectCodeStyleSettingsMigration\">\r\n    <option name=\"version\" value=\"2\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"1zjc3DiB1smAO12iMFZ5MuxsT9U\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">\r\n    <property name=\"RunOnceActivity.OpenProjectViewOnStart\" value=\"true\" />\r\n    <property name=\"RunOnceActivity.ShowReadmeOnStart\" value=\"true\" />\r\n    <property name=\"dart.analysis.tool.window.visible\" value=\"false\" />\r\n    <property name=\"last_opened_file_path\" value=\"$PROJECT_DIR$\" />\r\n    <property name=\"nodejs_interpreter_path.stuck_in_default_project\" value=\"undefined stuck path\" />\r\n    <property name=\"nodejs_npm_path_reset_for_default_project\" value=\"true\" />\r\n    <property name=\"show.migrate.to.gradle.popup\" value=\"false\" />\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"9e6b1164-d98f-46b5-8ca1-9441cfb0b270\" name=\"Changes\" comment=\"\" />\r\n      <created>1634664742247</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1634664742247</updated>\r\n      <workItem from=\"1634664744744\" duration=\"1850000\" />\r\n    </task>\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"FILTERS\">\r\n                <map>\r\n                  <entry key=\"branch\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"master\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"gossip update method\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"gossip update method\" />\r\n  </component>\r\n</project>
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	
++++ b/.idea/workspace.xml	
+@@ -4,22 +4,9 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="9e6b1164-d98f-46b5-8ca1-9441cfb0b270" name="Changes" comment="gossip update method">
+-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/K5s/ChatServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/K5s/ChatServer.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/K5s/protocol/GossipMessages.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/K5s/protocol/GossipMessages.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/ChatServer.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/ClientManager.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/CmdValues.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/Main.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/RoomManager.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/connectionManager/ClientMessageThread.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/connectionManager/ServerMessageThread.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/protocol/ServerToClientMessages.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/storage/ChatClient.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/storage/ChatRoom.class" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/target/classes/K5s/storage/Server.class" beforeDir="false" />
++    <list default="true" id="9e6b1164-d98f-46b5-8ca1-9441cfb0b270" name="Changes" comment="server.txt path updated">
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/K5s/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/K5s/Main.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -42,6 +29,14 @@
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+     <option name="UPDATE_TYPE" value="REBASE" />
++  </component>
++  <component name="GitSEFilterConfiguration">
++    <file-type-list>
++      <filtered-out-file-type name="LOCAL_BRANCH" />
++      <filtered-out-file-type name="REMOTE_BRANCH" />
++      <filtered-out-file-type name="TAG" />
++      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
++    </file-type-list>
+   </component>
+   <component name="ProjectCodeStyleSettingsMigration">
+     <option name="version" value="2" />
+@@ -59,6 +54,27 @@
+     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+     <property name="show.migrate.to.gradle.popup" value="false" />
++  </component>
++  <component name="RunManager">
++    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
++      <option name="MAIN_CLASS_NAME" value="K5s.Main" />
++      <module name="DS_K5s" />
++      <option name="PROGRAM_PARAMETERS" value="-p &quot;servers.txt&quot; -s &quot;s1&quot;" />
++      <extension name="coverage">
++        <pattern>
++          <option name="PATTERN" value="K5s.*" />
++          <option name="ENABLED" value="true" />
++        </pattern>
++      </extension>
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
++    <recent_temporary>
++      <list>
++        <item itemvalue="Application.Main" />
++      </list>
++    </recent_temporary>
+   </component>
+   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+   <component name="TaskManager">
+@@ -68,8 +84,87 @@
+       <option name="number" value="Default" />
+       <option name="presentableId" value="Default" />
+       <updated>1634664742247</updated>
+-      <workItem from="1634664744744" duration="1850000" />
++      <workItem from="1634664744744" duration="3349000" />
++      <workItem from="1634696546643" duration="10546000" />
++    </task>
++    <task id="LOCAL-00001" summary="gossip update method">
++      <created>1634666648106</created>
++      <option name="number" value="00001" />
++      <option name="presentableId" value="LOCAL-00001" />
++      <option name="project" value="LOCAL" />
++      <updated>1634666648106</updated>
++    </task>
++    <task id="LOCAL-00002" summary="ignored class file">
++      <created>1634666714520</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1634666714520</updated>
++    </task>
++    <task id="LOCAL-00003" summary="ignored class file">
++      <created>1634666732087</created>
++      <option name="number" value="00003" />
++      <option name="presentableId" value="LOCAL-00003" />
++      <option name="project" value="LOCAL" />
++      <updated>1634666732087</updated>
+     </task>
++    <task id="LOCAL-00004" summary="ServerMessageThread">
++      <created>1634706068067</created>
++      <option name="number" value="00004" />
++      <option name="presentableId" value="LOCAL-00004" />
++      <option name="project" value="LOCAL" />
++      <updated>1634706068067</updated>
++    </task>
++    <task id="LOCAL-00005" summary="GossipMessages">
++      <created>1634706234577</created>
++      <option name="number" value="00005" />
++      <option name="presentableId" value="LOCAL-00005" />
++      <option name="project" value="LOCAL" />
++      <updated>1634706234577</updated>
++    </task>
++    <task id="LOCAL-00006" summary="GossipMessages">
++      <created>1634706268176</created>
++      <option name="number" value="00006" />
++      <option name="presentableId" value="LOCAL-00006" />
++      <option name="project" value="LOCAL" />
++      <updated>1634706268176</updated>
++    </task>
++    <task id="LOCAL-00007" summary="Server|getClientServerSocket">
++      <created>1634706295924</created>
++      <option name="number" value="00007" />
++      <option name="presentableId" value="LOCAL-00007" />
++      <option name="project" value="LOCAL" />
++      <updated>1634706295924</updated>
++    </task>
++    <task id="LOCAL-00008" summary="chatServer|updateStae;getServer">
++      <created>1634706371800</created>
++      <option name="number" value="00008" />
++      <option name="presentableId" value="LOCAL-00008" />
++      <option name="project" value="LOCAL" />
++      <updated>1634706371800</updated>
++    </task>
++    <task id="LOCAL-00009" summary="new serverServerSocket ; renamed clientSocket">
++      <created>1634706410373</created>
++      <option name="number" value="00009" />
++      <option name="presentableId" value="LOCAL-00009" />
++      <option name="project" value="LOCAL" />
++      <updated>1634706410373</updated>
++    </task>
++    <task id="LOCAL-00010" summary="JSonArray">
++      <created>1634706956422</created>
++      <option name="number" value="00010" />
++      <option name="presentableId" value="LOCAL-00010" />
++      <option name="project" value="LOCAL" />
++      <updated>1634706956422</updated>
++    </task>
++    <task id="LOCAL-00011" summary="server.txt path updated">
++      <created>1634706960657</created>
++      <option name="number" value="00011" />
++      <option name="presentableId" value="LOCAL-00011" />
++      <option name="project" value="LOCAL" />
++      <updated>1634706960657</updated>
++    </task>
++    <option name="localTasksCounter" value="12" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+@@ -83,7 +178,7 @@
+                   <entry key="branch">
+                     <value>
+                       <list>
+-                        <option value="master" />
++                        <option value="dev-nil" />
+                       </list>
+                     </value>
+                   </entry>
+@@ -94,9 +189,18 @@
+         </entry>
+       </map>
+     </option>
++    <option name="oldMeFiltersMigrated" value="true" />
+   </component>
+   <component name="VcsManagerConfiguration">
+     <MESSAGE value="gossip update method" />
+-    <option name="LAST_COMMIT_MESSAGE" value="gossip update method" />
++    <MESSAGE value="ignored class file" />
++    <MESSAGE value="ServerMessageThread" />
++    <MESSAGE value="GossipMessages" />
++    <MESSAGE value="Server|getClientServerSocket" />
++    <MESSAGE value="chatServer|updateStae;getServer" />
++    <MESSAGE value="new serverServerSocket ; renamed clientSocket" />
++    <MESSAGE value="JSonArray" />
++    <MESSAGE value="server.txt path updated" />
++    <option name="LAST_COMMIT_MESSAGE" value="server.txt path updated" />
+   </component>
+ </project>
+\ No newline at end of file

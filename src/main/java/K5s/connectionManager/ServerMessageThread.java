@@ -1,6 +1,7 @@
 package K5s.connectionManager;
 
 import K5s.ChatServer;
+import K5s.ClientManager;
 import K5s.storage.Server;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -17,7 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static K5s.protocol.GossipMessages.gossipMessage;
+import static K5s.protocol.GossipMessages.*;
 import static K5s.protocol.LeaderProtocol.*;
 
 public class ServerMessageThread implements Runnable{
@@ -27,6 +28,7 @@ public class ServerMessageThread implements Runnable{
     private BufferedReader in;
     private JSONParser parser = new JSONParser();
     private final AtomicBoolean running=new AtomicBoolean(true);
+//    private Timer timer = new Timer();
 //    private DataOutputStream out;
 
 
@@ -82,6 +84,7 @@ public class ServerMessageThread implements Runnable{
                         break;
 
                     case "COORDINATOR":
+//                        timer.cancel();
                         if (serverId.compareTo(meServer.getServerId()) < 0){
                             initiateLeaderElection();
                         } else{
@@ -92,11 +95,12 @@ public class ServerMessageThread implements Runnable{
                         break;
 
                     case "OK":
+                        meServer.setisOkMessageReceived(true);
                         System.out.println("OK received from "+serverId);
                         meServer.setElectionInProgress(true);
-                        meServer.setIsPossibleLeader(false);
-                        Timer timer = new Timer();
-                        timer.schedule(task, 4000);
+                        meServer.setisOkMessageReceived(false);
+//                        Timer timer = new Timer();
+//                        timer.schedule(task, 4000);
                         break;
                     default:
                         System.out.println(message + " not configured");
@@ -108,19 +112,54 @@ public class ServerMessageThread implements Runnable{
                         JSONObject state = (JSONObject) message.get("state");
                         meServer.updateState(state);
                         JSONArray neighbour=(JSONArray) message.get("gossipServerList");
-                        System.out.print("List of gossipServerList rooms:");
+                        System.out.print("List of gossipServerList rooms:" +neighbour);
                         neighbour.remove(meServer.getServerId());
                         for (int i = 0; i < neighbour.size(); i++) {
                             System.out.print(" " + neighbour.get(i));
                         }
-                        String gossipNeighbour= (String) neighbour.get(new Random(neighbour.size()).nextInt());
-                        gossipMessage(state,neighbour);
-                        send(message,gossipNeighbour);
+                        String gossipNeighbour= (String) neighbour.get(new Random().nextInt(neighbour.size()));
+                        message = gossipMessage(state,neighbour);
+                        try {
+                            send(message,gossipNeighbour);
+                        }catch (IOException ex){
+                            gossipNeighbour= (String) neighbour.get(new Random().nextInt(neighbour.size()));
+                            try {
+                                send(message, gossipNeighbour);
+                            }catch (IOException e){
+//                                TODO :report server failure
+                            }
+                        }
                         break;
                     default:
                         System.out.println(message + "not configured");
                 }
                 break;
+            case "confirmIdentity":
+                String identity = (String) message.get("identity");
+                System.out.println("received confirm identity for : "+identity+" from leader");
+                boolean approved = (boolean) message.get("approved");
+                ClientManager.replyIdentityRequest(identity,approved);
+                break;
+            case "requestIdentityApproval":
+                String i = (String) message.get("identity");
+                String serverid = (String) message.get("serverid");
+                System.out.println("received identity approval req for : "+i+" from server : "+serverid);
+                if(meServer.getGlobalIdentity().contains(i)){
+                    //Assumption : this case message will only be received by leader.
+                    send(newIdentityApprovalReply(false,i),serverid);
+                }else{
+                    send(newIdentityApprovalReply(true,i),serverid);
+                    try {
+                        send(gossipMessage(meServer.getState(), meServer.getOtherServerIdJSONArray()), meServer.getRandomeNeighbour());
+                    } catch (IOException e){
+                        try {
+                            send(gossipMessage(meServer.getState(), meServer.getOtherServerIdJSONArray()), meServer.getRandomeNeighbour());
+                        }catch (IOException ioException){
+//                            TODO :detect failure
+                        }
+                    }
+//                    TODO:update Leader state and the methode updates the leader state should initiate the gossip
+                }
             default:
                 System.out.println(message + "not configured");
         }
@@ -133,7 +172,7 @@ public class ServerMessageThread implements Runnable{
             OutputStream out = ss.getOutputStream();
             out.write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
             out.flush();
-            out.close();
+//            out.close();
         }
         System.out.println("Reply :" + obj );
 
@@ -141,17 +180,17 @@ public class ServerMessageThread implements Runnable{
 //        out.close();
     }
 
-    TimerTask task = new TimerTask() {
-        public void run() {
-            if (meServer.getElectionInProgress()&& meServer.isPossibleLeader()){
-                initiateLeaderElection();
-            }
-        }
-    };
+//    TimerTask task = new TimerTask() {
+//        public void run() {
+//            if (meServer.getElectionInProgress() && meServer.isOkMessageReceived()){
+//                initiateLeaderElection();
+//            }
+//        }
+//    };
 
     public void initiateLeaderElection(){
         meServer.setElectionInProgress(true);
-        meServer.setIsPossibleLeader(true);
+        meServer.setisOkMessageReceived(false);
         ArrayList<Server> otherServers = meServer.getOtherServers();
         int count = 0;
         for(Server s : otherServers){
@@ -179,7 +218,9 @@ public class ServerMessageThread implements Runnable{
             meServer.setElectionInProgress(false);
             System.out.println(meServer.getServerId()+ " is Leader");
         }
-        Timer timer = new Timer();
-        timer.schedule(task, 4000);
+//        timer.schedule(task, 4000);
+    }
+    private void gossipState(String serverId) throws IOException {
+        send(gossipMessage(meServer.getState() ,meServer.getOtherServerIdJSONArray()),serverId);
     }
 }

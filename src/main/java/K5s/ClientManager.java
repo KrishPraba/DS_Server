@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static K5s.protocol.ServerToClientMessages.*;
+import static K5s.protocol.ServerToClientProtocol.*;
 
 public class ClientManager {
 

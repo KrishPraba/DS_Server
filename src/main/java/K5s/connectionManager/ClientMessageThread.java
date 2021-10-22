@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static K5s.protocol.ServerToClientMessages.*;
+import static K5s.protocol.ServerToClientProtocol.*;
 
 public class ClientMessageThread implements Runnable{
     private final Socket socket;
@@ -113,7 +113,6 @@ public class ClientMessageThread implements Runnable{
                 /**
                  * for newidentity message
                  * check the server object for availability  of the identity
-                 * TODO : server object should implement method to communicate with leader
                  * if the requested identity s available create new User object ,
                  * add the user to the server user list and set user to the current messageReceiveThread
                  * then create reply message using  getNewIdentityReply and send it to the user

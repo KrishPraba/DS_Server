@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static K5s.protocol.ServerToClientMessages.getRoomChangeBroadcast;
+import static K5s.protocol.ServerToClientProtocol.getRoomChangeBroadcast;
 
 public class RoomManager {
 
@@ -17,6 +17,7 @@ public class RoomManager {
     private ChatServer meserver;
 
     public RoomManager(ChatServer meserver){
+
         this.mainHall = new ChatRoom("MainHall-s1",meserver.getServerId() );
         this.chatRooms = new ArrayList<>();
         chatRooms.add(this.mainHall);

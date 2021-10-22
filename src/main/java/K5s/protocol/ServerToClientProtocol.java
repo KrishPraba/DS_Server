@@ -5,7 +5,7 @@ import org.json.simple.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerToClientMessages {
+public class ServerToClientProtocol {
     
     
     public static JSONObject getCreateRoomRequest(String roomid) {

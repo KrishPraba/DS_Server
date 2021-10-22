@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
+import static K5s.protocol.GossipMessages.gossipMessage;
 import static K5s.protocol.LeaderProtocol.*;
 
 public class ServerManager {
@@ -28,7 +30,7 @@ public class ServerManager {
         if(meServer.getGlobalIdentity().contains(identity)){
             return "FALSE";
         }else {
-            System.out.println("this server is leader : "+meServer.isLeader()+" "+meServer.getLeader());
+            System.out.println("Leader : "+meServer.getLeader());
             if (!meServer.isLeader()){
                 JSONObject newtIdentityApprovalRequest = newtIdentityApprovalRequest(meServer.getServerId(),identity);
                 if(!meServer.getLeader().isEmpty()){
@@ -55,6 +57,46 @@ public class ServerManager {
             instance=new ServerManager(meserver);
         }
         return instance;
+    }
+
+    public void initiateLeaderElection(){
+        meServer.setElectionInProgress(true);
+        meServer.setisOkMessageReceived(false);
+        ArrayList<Server> otherServers = meServer.getOtherServers();
+        int count = 0;
+        for(Server s : otherServers){
+            if (s.getServerId().compareTo(meServer.getServerId()) > 0){
+                try{
+                    send(electionMessage(meServer.getServerId()), s.getServerId());
+                    count += 1;
+                }catch(IOException e){
+                    System.out.println("ELECTION Server "+s.getServerId()+ "is down");
+                }
+            }
+        }
+
+        if(count == 0){
+
+            for (Server s: otherServers) {
+                try{
+                    send(coordinatorMessage(meServer.getServerId()), s.getServerId());
+                } catch(IOException e) {
+                    System.out.println("COORDINATOR Server "+s.getServerId()+ " is down");
+                }
+            }
+
+            meServer.setLeader(meServer.getServerId());
+            meServer.setElectionInProgress(false);
+            System.out.println(meServer.getServerId()+ " is Leader");
+        }
+//        timer.schedule(task, 4000);
+    }
+    private void gossipState(String serverId) throws IOException {
+        send(gossipMessage(meServer.getState() ,meServer.getOtherServerIdJSONArray()),serverId);
+    }
+
+    public static ChatServer getMeServer() {
+        return meServer;
     }
 
     private static void send(JSONObject obj, String serverId) throws IOException {

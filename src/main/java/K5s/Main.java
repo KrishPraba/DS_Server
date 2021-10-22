@@ -23,7 +23,6 @@ public class Main {
         Socket clientSocket;
         ServerSocket clientServerSocket;
         ServerSocket serverServerSocket;
-//        TODO initiate a different thread with new server socket for server to server communication
 
 
         //load command line args
@@ -91,7 +90,8 @@ public class Main {
             System.out.println("InetServerAddress : " + serverServerSocket.getInetAddress());
             System.out.println("InetServerPort: " + serverServerSocket.getLocalPort());
 
-            Thread serverMessageThread = new Thread(new ServerMessageThread(serverServerSocket,meServer));
+            ServerManager serverManager = ServerManager.getInstance(meServer);
+            Thread serverMessageThread = new Thread(new ServerMessageThread(serverServerSocket,serverManager));
             serverMessageThread.start();
             /**
              * For new connection received to the clientPort accept and create a Socket(clientSocket)
@@ -101,7 +101,6 @@ public class Main {
             //noinspection InfiniteLoopStatement
             RoomManager roomManager = new RoomManager(meServer);
             ClientManager clientManager = new ClientManager(roomManager);
-            ServerManager serverManager = ServerManager.getInstance(meServer);
             // start sending thread
 
             while (true) {

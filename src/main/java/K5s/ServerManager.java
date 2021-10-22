@@ -1,6 +1,5 @@
 package K5s;
 
-import K5s.connectionManager.ServerMessageThread;
 import K5s.storage.Server;
 import org.json.simple.JSONObject;
 
@@ -9,6 +8,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Map;
 
 import static K5s.protocol.GossipMessages.gossipMessage;
 import static K5s.protocol.LeaderProtocol.*;
@@ -51,6 +51,44 @@ public class ServerManager {
         }
         return "FALSE";
     }
+    public static  String getServerIdOfRoom(String roomid){
+        Map<String, ArrayList<String>> gS = meServer.getGlobalServerState();
+        for (String key : gS.keySet()) {
+            for (String room : gS.get(key)) {
+                if (room == roomid) {
+                    return key;
+                }
+            }
+        }
+        return null;
+    }
+    public static String  isAvailableRoomId(String roomid){
+        if(getServerIdOfRoom(roomid)!=null){
+            return "FALSE";
+        }else {
+            System.out.println("Leader is : "+meServer.getLeader());
+            if (!meServer.isLeader()){
+                JSONObject newtRoomIdApprovalRequest = newtRoomIdApprovalRequest(roomid,meServer.getServerId());
+                if(!meServer.getLeader().isEmpty()){
+                    try {
+                        send(newtRoomIdApprovalRequest,meServer.getLeader());
+                        return "WAITING";
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return "FALSE";
+                        //this it just an availability measure
+                    }
+                }else {
+                    initiateLeaderElection();
+//                    TODO:electionmessage
+                }
+            }else {
+                return "TRUE";
+            }
+        }
+        return "FALSE";
+    }
+
 
     public static ServerManager getInstance(ChatServer meserver){
         if (instance==null){
@@ -59,7 +97,7 @@ public class ServerManager {
         return instance;
     }
 
-    public void initiateLeaderElection(){
+    public static void initiateLeaderElection(){
         meServer.setElectionInProgress(true);
         meServer.setisOkMessageReceived(false);
         ArrayList<Server> otherServers = meServer.getOtherServers();

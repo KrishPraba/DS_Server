@@ -173,10 +173,16 @@ public class ChatServer extends Server {
     public ArrayList<String> getRooms() {
         ArrayList<String> r = new ArrayList<>();
         globalServerState.keySet().forEach(key ->
-                globalServerState.get(key).forEach(room ->
-                        r.add(room)
-                )
+                globalServerState.get(key).forEach(room ->{
+                        if (!r.contains(room)) {
+                            r.add(room);
+
+                        }
+                })
         );
         return r;
+    }
+    public Map<String,ArrayList<String>> getGlobalServerState(){
+        return this.globalServerState;
     }
 }

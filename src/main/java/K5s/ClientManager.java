@@ -17,7 +17,7 @@ import static K5s.protocol.ServerToClientProtocol.*;
 public class ClientManager {
 
     private static ArrayList<ChatClient> chatClients;
-    private static RoomManager roomManager;
+    public static RoomManager roomManager;
     private static Map<String ,ClientMessageThread> identitySubscribers;
 
     public ClientManager(RoomManager manager){
@@ -26,7 +26,6 @@ public class ClientManager {
         identitySubscribers=new HashMap<>();
 
     }
-
     public synchronized boolean newIdentity(String identity, ClientMessageThread clientMessageThread){
 
         switch (isAvailableIdentity(identity ,clientMessageThread)) {
@@ -42,6 +41,57 @@ public class ClientManager {
             default:
                 System.out.println("Invalid case");
                 return false;
+        }
+    }
+    public synchronized boolean newRoom(String roomId, ChatClient client){
+
+        switch (roomManager.isAvailableRoomName(roomId ,client)) {
+            case "WAITING":
+                System.out.println("User waiting for approval.");
+                return true;
+            case "FALSE":
+                System.out.println(roomId + " already in use.");
+                return false;
+            case "TRUE":
+                replyNewRoomRequest(roomId,true);
+                return true;
+            default:
+                System.out.println("Invalid case");
+                return false;
+        }
+    }
+    public static void replyNewRoomRequest(String roomid,boolean approved){
+        Map<String, ChatClient> sub = RoomManager.createRoomSubscribers;
+        if(sub.containsKey(roomid)){
+            ChatClient user = sub.get(roomid);
+            ClientMessageThread clientMessageThread = user.getMessageThread();
+            if (approved) {
+                System.out.println("Room has been approved.");
+                ChatRoom fr =user.getRoom();
+                ChatRoom r= roomManager.createRoom(roomid,user);
+                user.setRoom(r);
+                sub.remove(roomid);
+                try {
+                    clientMessageThread.send(getCreateRoomReply(roomid,true));
+                    sendRoomChangeBroadcast(user,fr,r);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+                if(ChatServer.isLeader()){
+                    ServerManager.gossipState();
+                }
+            }else {
+                System.out.println("User request declined.");
+                sub.remove(roomid);
+                try {
+                    clientMessageThread.send(getCreateRoomReply(roomid,false));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            //server detected timeout and reply to the client that identity not available to ensure availability
+//            TODO:inform leader to delete the approved identity
         }
     }
     public static void replyIdentityRequest(String identity,boolean approved){
@@ -133,15 +183,10 @@ public class ClientManager {
         return null;
     }
 
-    public void sendRoomCreateBroadcast(ChatClient client, ChatRoom room){
-        ChatRoom former = client.getRoom();
-//        System.out.println(former.getRoomId());
-//        System.out.println(room.getRoomId());
-        JSONObject message =getRoomChangeBroadcast(client.getChatClientID(),former.getRoomId(),room.getRoomId());
-        client.setRoom(room);
-        roomManager.broadcastMessageToMembers(former,message);
-        roomManager.removeUserFromChatRoom(client);
-
+    public static void sendRoomChangeBroadcast(ChatClient client, ChatRoom formerRoom, ChatRoom newRoom){
+        JSONObject message =getRoomChangeBroadcast(client.getChatClientID(),formerRoom.getRoomId(),newRoom.getRoomId());
+        roomManager.broadcastMessageToMembers(formerRoom,message);
+        roomManager.broadcastMessageToMembers(newRoom,message);
     }
 
     public synchronized boolean clientDeleteRoom(ChatClient client, String roomId){
@@ -211,6 +256,5 @@ public class ClientManager {
     public synchronized void ownerDeleteRoom(ChatClient client){
         roomManager.deleteRoom(client.getRoom());
     }
-
 
 }

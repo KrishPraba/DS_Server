@@ -58,9 +58,14 @@ public class ClientMessageThread implements Runnable{
             this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));
             JSONObject message;
             while (this.running.get()){
-                message = (JSONObject) parser.parse(in.readLine());
-                System.out.println("Receiving: " + message);
-                this.MessageReceive(message);
+//                try {
+                    message = (JSONObject) parser.parse(in.readLine());
+                    System.out.println("Receiving: " + message);
+                    this.MessageReceive(message);
+//                }catch (NullPointerException ne){
+//                    System.out.println("nullpoint");
+//
+//                }
             }
 
             this.in.close();
@@ -77,8 +82,8 @@ public class ClientMessageThread implements Runnable{
             } catch (IOException ex) {
                 System.out.println("Communication Error: " + ex.getMessage());
             } catch (NullPointerException ex){
-
-                e.printStackTrace();
+                System.out.println("nullpoint");
+//                e.printStackTrace();
             }
 
             running.set(false);
@@ -203,8 +208,6 @@ public class ClientMessageThread implements Runnable{
                  * if the requested user already in a room and he is the owner of that room send a failure message
                  * else check if the current server has this Room
                  * if it exists call user joinroom methode to move him to that room.
-                 * else check TODO: whether other servers has that room ,
-                 * if so then TODO : send a route message
                  * else send a fail message
                  */
                 String jrid = (String) message.get("roomid");
@@ -219,9 +222,6 @@ public class ClientMessageThread implements Runnable{
                 String clientIdentity = (String) message.get("identity");
 
                 manager.moveJoinRoom(clientIdentity, joinRoomid, this, formerRoomid);
-//                if(!isServerChange){
-//                    send(getMoveJoinReply(clientIdentity,true,this.server.getServerId()));
-//                }
 
                 break;
             case "deleteroom":
@@ -270,9 +270,9 @@ public class ClientMessageThread implements Runnable{
         System.out.println("Reply :" + obj );
         out.write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
         out.flush();
-        if (client==null){
-            this.running.set(false);
-        }
+//        if (client==null){
+//            this.running.set(false);
+//        }
     }
 
 }

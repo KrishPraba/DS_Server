@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import static K5s.protocol.ServerToClientProtocol.getRoomChangeBroadcast;
 
@@ -17,8 +18,8 @@ public class RoomManager {
     private ChatServer meserver;
 
     public RoomManager(ChatServer meserver){
-        String serverId = meserver.getServerId();
-        this.mainHall = new ChatRoom("MainHall-"+serverId,meserver.getServerId() );
+        String serverId = "MainHall-"+ meserver.getServerId();
+        this.mainHall = new ChatRoom(serverId,meserver.getServerId() );
         meserver.addRoom(serverId,mainHall.getRoomId());
         this.chatRooms = new ArrayList<>();
         chatRooms.add(this.mainHall);
@@ -132,5 +133,30 @@ public class RoomManager {
             }
         }
         return null;
+    }
+
+    public Server findGlobalRoom(String roomID){
+        Map<String, ArrayList<String>> globalState = meserver.getGlobalServerState();
+        System.out.println("global state"+globalState);
+        System.out.println(roomID);
+        for (String key : globalState.keySet()) {
+            for (String room : globalState.get(key)) {
+                System.out.println(room);
+                if (room.compareTo(roomID)==0) {
+                        return meserver.getServer(key);
+                }
+
+            }
+        }
+
+        return null;
+    }
+
+    public void removeIdentity(String id, JSONObject message){
+        meserver.removeIdentity(id);
+    }
+
+    public ChatServer getMeserver() {
+        return meserver;
     }
 }

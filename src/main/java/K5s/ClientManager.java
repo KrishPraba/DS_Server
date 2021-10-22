@@ -5,6 +5,7 @@ import K5s.connectionManager.ClientMessageThread;
 import K5s.connectionManager.ServerMessageThread;
 import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
+import K5s.storage.Server;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
@@ -19,12 +20,10 @@ public class ClientManager {
     private static ArrayList<ChatClient> chatClients;
     private static RoomManager roomManager;
     private static Map<String ,ClientMessageThread> identitySubscribers;
-
     public ClientManager(RoomManager manager){
         chatClients = new ArrayList<>();
         this.roomManager = manager;
         identitySubscribers=new HashMap<>();
-
     }
 
     public synchronized boolean newIdentity(String identity, ClientMessageThread clientMessageThread){
@@ -109,7 +108,6 @@ public class ClientManager {
 
         ArrayList<String> roomIds = roomManager.getRoomIds();
 
-        // TODO : get list of other rooms in system by referring other server details through server manager
         return roomIds;
     }
 
@@ -163,6 +161,7 @@ public class ClientManager {
             return false;
         }
         ChatRoom joinRoom = roomManager.findRoomExists(roomId);
+        System.out.println(joinRoom);
         if (joinRoom != null){
             client.setRoom(joinRoom);
             formerRoom.removeMember(client);
@@ -172,23 +171,56 @@ public class ClientManager {
             roomManager.broadcastMessageToMembers(joinRoom,message);
             return true;
         }
-        return false;
+        else{
+            Server s = roomManager.findGlobalRoom(roomId);
+            if(s == null){
+                return false;
+            } else {
+                formerRoom.removeMember(client);
+                JSONObject message = getRoomChangeBroadcast(client.getChatClientID(),formerRoom.getRoomId(),roomId);
+                roomManager.broadcastMessageToMembers(formerRoom,message);
+                chatClients.remove(client);
+//                JSONObject deleteMessage = sendDeleteIdenity(client.getChatClientID());
+//                roomManager.removeIdentity(client.getChatClientID(),deleteMessage);
+                JSONObject routeMessage = getRouteUser(client.getChatClientID(), s.getIpAddress(), roomId, String.valueOf(s.getClientPort()));
+                try {
+//                    ServerManager.sendBroadcast(deleteMessage);
+                    client.getMessageThread().send(routeMessage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+        }
+//        return false;
     }
 
     public synchronized void moveJoinRoom(String identity, String joinRoomId, ClientMessageThread recieveThread,
                                           String formerRoomId){
         ChatRoom room = roomManager.findRoomExists(joinRoomId);
-        if(room != null){
-            if(newIdentity(identity, recieveThread)){
+        ChatClient c = new ChatClient(identity, recieveThread);
+        recieveThread.setClient(c);
+        JSONObject movejoinreply = getMoveJoinReply(identity,true,roomManager.getMeserver().getServerId());
+        try {
+            c.getMessageThread().send(movejoinreply);
+            chatClients.add(c);
+        } catch (IOException e) {
+            e.printStackTrace();
+            //TODO Client has disconnected add quit code
+        }
 
-            }
+        if(room != null){
+            room.addMember(c);
+            c.setRoom(room);
+            JSONObject message = getRoomChangeBroadcast(c.getChatClientID(),formerRoomId,room.getRoomId());
+            roomManager.broadcastMessageToMembers(room,message);
         }
         else{
-//            ChatRoom mainHall = roomManager.getMainHall();
-//            JSONObject message = getRoomChangeBroadcast(client.getChatClientID(),formerRoomId,mainHall.getRoomId());
-//            roomManager.broadcastMessageToMembers(mainHall,message);
-//        TODO:once move join received check the identity availability and if the identity is available then check whether room is available then if both available move
-            //TODO : verify with the requirements how to proceed if identity not available.
+            ChatRoom mainHall = roomManager.getMainHall();
+            mainHall.addMember(c);
+            c.setRoom(mainHall);
+            JSONObject message = getRoomChangeBroadcast(c.getChatClientID(),formerRoomId,mainHall.getRoomId());
+            roomManager.broadcastMessageToMembers(mainHall,message);
         }
     }
 
@@ -211,6 +243,8 @@ public class ClientManager {
     public synchronized void ownerDeleteRoom(ChatClient client){
         roomManager.deleteRoom(client.getRoom());
     }
+
+
 
 
 }

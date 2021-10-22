@@ -63,7 +63,7 @@ public class Main {
             }else{
                 for (Server server :servers) {
                     meServer.addServer(server);
-                    String roomid ="Mainhall-"+server.getServerId();
+                    String roomid ="MainHall-"+server.getServerId();
                     meServer.addRoom(server.getServerId(),roomid);
                 }
             }

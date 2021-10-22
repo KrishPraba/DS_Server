@@ -29,7 +29,7 @@ public class ServerMessageThread implements Runnable{
     private BufferedReader in;
     private JSONParser parser = new JSONParser();
     private final AtomicBoolean running=new AtomicBoolean(true);
-    private ServerManager manager;
+    private static ServerManager manager;
 //    private Timer timer = new Timer();
 //    private DataOutputStream out;
 
@@ -59,7 +59,7 @@ public class ServerMessageThread implements Runnable{
             e.printStackTrace();
         }
     }
-    private  void MessageReceive(JSONObject message) throws IOException {
+    private static void MessageReceive(JSONObject message) throws IOException {
         String type = (String) message.get("type");
         String kind =(String) message.get("kind");
 //        System.out.println(kind);
@@ -167,7 +167,7 @@ public class ServerMessageThread implements Runnable{
                 System.out.println(message + "not configured");
         }
     }
-    private void send(JSONObject obj,String serverId) throws IOException {
+    public static void send(JSONObject obj,String serverId) throws IOException {
         Server server=manager.getMeServer().getServer(serverId);
         if (server!=null){
             Socket ss=server.getSocket();

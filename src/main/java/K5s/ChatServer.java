@@ -4,6 +4,7 @@ import K5s.storage.Server;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ public class ChatServer extends Server {
     private ArrayList<Server> otherServers = new ArrayList<>();
     private Map<String,ArrayList<String>> globalServerState;
     private ArrayList<String> globalIdentity;
-    private boolean isLeader = false;
+    private static boolean isLeader = false;
     private String leader;
     private boolean electionInProgress = false;
     private boolean isOkMessageReceived =false;
@@ -150,10 +151,32 @@ public class ChatServer extends Server {
     public void setisOkMessageReceived(boolean x){
         this.isOkMessageReceived = x;
     }
-    public boolean isLeader(){
+    public static boolean isLeader(){
         return isLeader;
     }
     public ArrayList<String> getGlobalIdentity(){
         return this.globalIdentity;
+    }
+    public void addRoom(String server,String room){
+        if(globalServerState.containsKey(server)){
+            ArrayList<String> s =globalServerState.get(server);
+            if(!s.contains(room)){
+                s.add(room);
+            }
+        }else{
+            ArrayList<String> r=new ArrayList<>();
+            r.add(room);
+            globalServerState.put(server,r);
+        }
+    }
+
+    public ArrayList<String> getRooms() {
+        ArrayList<String> r = new ArrayList<>();
+        globalServerState.keySet().forEach(key ->
+                globalServerState.get(key).forEach(room ->
+                        r.add(room)
+                )
+        );
+        return r;
     }
 }

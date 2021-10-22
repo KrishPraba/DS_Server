@@ -61,7 +61,11 @@ public class Main {
             if (meServer==null){
                 System.err.println("Error while parsing File specified server not found: ");
             }else{
-                for (Server server :servers) meServer.addServer(server);
+                for (Server server :servers) {
+                    meServer.addServer(server);
+                    String roomid ="Mainhall-"+server.getServerId();
+                    meServer.addRoom(server.getServerId(),roomid);
+                }
             }
             System.out.println("servers : " + servers.size());
 

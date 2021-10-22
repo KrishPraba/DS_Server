@@ -91,8 +91,16 @@ public class ServerManager {
         }
 //        timer.schedule(task, 4000);
     }
-    private void gossipState(String serverId) throws IOException {
-        send(gossipMessage(meServer.getState() ,meServer.getOtherServerIdJSONArray()),serverId);
+    public static void gossipState()  {
+        try {
+            send(gossipMessage(meServer.getState(), meServer.getOtherServerIdJSONArray()), meServer.getRandomeNeighbour());
+        } catch (IOException e){
+            try {
+                send(gossipMessage(meServer.getState(), meServer.getOtherServerIdJSONArray()), meServer.getRandomeNeighbour());
+            }catch (IOException ioException){
+//                            TODO :detect failure
+            }
+        }
     }
 
     public static ChatServer getMeServer() {

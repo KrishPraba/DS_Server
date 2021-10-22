@@ -17,8 +17,9 @@ public class RoomManager {
     private ChatServer meserver;
 
     public RoomManager(ChatServer meserver){
-
-        this.mainHall = new ChatRoom("MainHall-s1",meserver.getServerId() );
+        String serverId = meserver.getServerId();
+        this.mainHall = new ChatRoom("MainHall-"+serverId,meserver.getServerId() );
+        meserver.addRoom(serverId,mainHall.getRoomId());
         this.chatRooms = new ArrayList<>();
         chatRooms.add(this.mainHall);
         this.meserver=meserver;
@@ -56,9 +57,7 @@ public class RoomManager {
     }
 
     public ArrayList<String> getRoomIds(){
-        ArrayList<String> roomIds =new ArrayList<>();
-        this.chatRooms.forEach(room -> roomIds.add(room.getRoomId()));
-        return roomIds;
+        return meserver.getRooms();
     }
 
     public synchronized boolean isRoomIdAvailableToCreate(String roomId){

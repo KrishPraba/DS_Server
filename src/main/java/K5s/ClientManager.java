@@ -2,6 +2,7 @@ package K5s;
 
 import K5s.connectionManager.ClientMessageThread;
 //import K5s.storage.ChatClient;
+import K5s.connectionManager.ServerMessageThread;
 import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
 import org.json.simple.JSONObject;
@@ -55,6 +56,9 @@ public class ClientManager {
                 clientMessageThread.setClient(user);
                 sendMainhallBroadcast(user);
                 identitySubscribers.remove(identity);
+                if(ChatServer.isLeader()){
+                    ServerManager.gossipState();
+                }
             }else {
                 System.out.println("User request declined.");
                 ClientMessageThread clientMessageThread = identitySubscribers.get(identity);
@@ -97,11 +101,12 @@ public class ClientManager {
     }
 
     public static void sendMainhallBroadcast(ChatClient client){
-        JSONObject message = getRoomChangeBroadcast(client.getChatClientID(), "", "MainHall-s1");
+        JSONObject message = getRoomChangeBroadcast(client.getChatClientID(), "", roomManager.getMainHall().getRoomId());
         roomManager.broadcastMessageToMembers(roomManager.getMainHall(),message);
     }
 
     public ArrayList<String> listRoomIds(){
+
         ArrayList<String> roomIds = roomManager.getRoomIds();
 
         // TODO : get list of other rooms in system by referring other server details through server manager

@@ -14,6 +14,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+//TODO MAINHALL DUPLICATES
+//TODO IO EXCEPTIONS FOR LEADER ELECTION
+//CREATEROOM, DELETEROOM AND QUIT (CTRL +C)
+
 public class Main {
 
     public static void main(String[] args){
@@ -63,7 +67,7 @@ public class Main {
             }else{
                 for (Server server :servers) {
                     meServer.addServer(server);
-                    String roomid ="Mainhall-"+server.getServerId();
+                    String roomid ="MainHall-"+server.getServerId();
                     meServer.addRoom(server.getServerId(),roomid);
                 }
             }

@@ -39,11 +39,10 @@ public class ServerManager {
                         return "WAITING";
                     } catch (IOException e) {
                         e.printStackTrace();
+                        initiateLeaderElection();
                         return "FALSE";
                         //this it just an availability measure
                     }
-                }else {
-//                    TODO:electionmessage
                 }
             }else {
                 return "TRUE";
@@ -143,6 +142,20 @@ public class ServerManager {
 
     public static ChatServer getMeServer() {
         return meServer;
+    }
+
+    public static void sendBroadcast(JSONObject message){
+        for (Server s:
+             meServer.getOtherServers()) {
+            try {
+                send(message,s.getServerId());
+            } catch (IOException e) {
+                System.out.println("BROADCAST Server " + s.getServerId() + " is down");
+                if (s.getServerId() == meServer.getLeader()){
+                    initiateLeaderElection();
+                }
+            }
+        }
     }
 
     private static void send(JSONObject obj, String serverId) throws IOException {

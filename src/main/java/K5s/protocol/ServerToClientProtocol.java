@@ -70,7 +70,7 @@ public class ServerToClientProtocol {
     public static JSONObject getMoveJoinReply(String identity, Boolean approved, String serverid) {
         JSONObject movejoin = new JSONObject();
         movejoin.put("type", "serverchange");
-        movejoin.put("approved", approved);
+        movejoin.put("approved", approved.toString());
         movejoin.put("serverid", serverid);
         return movejoin;
     }
@@ -84,6 +84,14 @@ public class ServerToClientProtocol {
         delete.put("approved", approved);
         return delete;
     }
+
+    public static JSONObject sendDeleteIdenity(String identity) {
+        JSONObject delete_identity = new JSONObject();
+        delete_identity.put("type", "deleteidenity");
+        delete_identity.put("identityidentity", identity);
+        return delete_identity;
+    }
+
     //reply
     public static JSONObject getDeleteRoomRequest(String roomid) {
         JSONObject delete = new JSONObject();

@@ -27,7 +27,7 @@ public class Server {
         this.serverId=serverId;
         this.ipAddress=ipAddress;
         this.roomIds = new ArrayList<>();
-        roomIds.add("Mainhall-"+serverId);
+        roomIds.add("MainHall-"+serverId);
     }
 
     public synchronized void addRoomId(String roomId) {

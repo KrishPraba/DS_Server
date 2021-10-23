@@ -64,6 +64,14 @@ public class ServerMessageThread implements Runnable{
         String kind =(String) message.get("kind");
 //        System.out.println(kind);
         switch (type){
+            case "deleteidenity":
+                String deleteIdentity = (String) message.get("identity");
+                ChatServer s = manager.getMeServer();
+                s.removeIdentity(deleteIdentity);
+                break;
+            case "deleteroom":
+
+                break;
             case "bully":
                 String serverId = (String) message.get("serverid");
                 switch (kind) {

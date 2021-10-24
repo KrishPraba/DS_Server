@@ -95,14 +95,14 @@ public class LeaderProtocol {
     /**
      * get new roomID approval from leader
      * @param roomid roomId to be checked
-     * @param identity identity
+     * @param serverid identity
      * @return      JSONObject
      */
-    public static JSONObject newtRoomIdApprovalRequest( String roomid,String identity) {
+    public static JSONObject newtRoomIdApprovalRequest( String roomid,String serverid) {
         JSONObject leader = new JSONObject();
         leader.put("type", "requestRoomIDApproval");
         leader.put("roomid", roomid);
-        leader.put("identity", identity);
+        leader.put("serverid", serverid);
         return leader;
     }
 
@@ -112,7 +112,7 @@ public class LeaderProtocol {
      * @param roomid    roomid of the request
      * @return      JSONObject
      */
-    public static JSONObject newtRoomIdApprovalReply( String approved,String roomid) {
+    public static JSONObject newtRoomIdApprovalReply( boolean approved,String roomid) {
         JSONObject leader = new JSONObject();
         leader.put("type", "confirmRoomID");
         leader.put("approved", approved);

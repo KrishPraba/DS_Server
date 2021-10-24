@@ -171,6 +171,34 @@ public class ServerMessageThread implements Runnable{
                     }
 //                    TODO:update Leader state and the methode updates the leader state should initiate the gossip
                 }
+                break;
+            case "requestRoomIDApproval":
+                String rrid = (String) message.get("roomid");
+                String rsid = (String) message.get("serverid");
+                System.out.println("received roomId approval req for : "+rrid+" from server : "+rsid);
+                if(manager.getMeServer().getRooms().contains(rrid)){
+                    //Assumption : this case message will only be received by leader.
+                    send(newtRoomIdApprovalReply(false,rrid),rsid);
+                }else {
+                    manager.getMeServer().addRoom(rsid,rrid);
+                    send(newtRoomIdApprovalReply(true,rrid),rsid);
+                }
+                try {
+                    send(gossipMessage(manager.getMeServer().getState(), manager.getMeServer().getOtherServerIdJSONArray()), manager.getMeServer().getRandomeNeighbour());
+                } catch (IOException e){
+                    try {
+                        send(gossipMessage(manager.getMeServer().getState(), manager.getMeServer().getOtherServerIdJSONArray()), manager.getMeServer().getRandomeNeighbour());
+                    }catch (IOException ioException){
+    //                            TODO :detect failure
+                    }
+                }
+                break;
+            case "confirmRoomID":
+                String rid = (String) message.get("roomid");
+                boolean ridApproved = (boolean) message.get("approved");
+                System.out.println("received confirm roomId for : "+rid+" from leader");
+                ClientManager.replyNewRoomRequest(rid,ridApproved);
+                break;
             default:
                 System.out.println(message + "not configured");
         }

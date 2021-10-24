@@ -1,5 +1,6 @@
 package K5s;
 
+import K5s.connectionManager.ClientMessageThread;
 import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
 import K5s.storage.Server;
@@ -8,14 +9,16 @@ import org.json.simple.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 
-import static K5s.protocol.ServerToClientProtocol.getRoomChangeBroadcast;
+import static K5s.protocol.ServerToClientProtocol.*;
 
 public class RoomManager {
 
-    private ArrayList<ChatRoom> chatRooms;
-    private ChatRoom mainHall;
+    private static ArrayList<ChatRoom> chatRooms;
+    private static ChatRoom mainHall;
     private ChatServer meserver;
+    public static Map<String,ChatClient> createRoomSubscribers;
 
     public RoomManager(ChatServer meserver){
         String serverId = "MainHall-"+ meserver.getServerId();
@@ -23,10 +26,34 @@ public class RoomManager {
         meserver.addRoom(serverId,mainHall.getRoomId());
         this.chatRooms = new ArrayList<>();
         chatRooms.add(this.mainHall);
+        createRoomSubscribers=new HashMap<>();
         this.meserver=meserver;
-//        TODO:add mainhall to global roomlist
     }
 
+
+    public synchronized String isAvailableRoomName(String roomId,ChatClient client) {
+        for (ChatRoom r : chatRooms) {
+            if (r.getRoomId().equalsIgnoreCase(roomId)) {
+                return "FALSE";
+            }
+        }
+        switch (ServerManager.isAvailableRoomId(roomId)) {
+            case "WAITING":
+                System.out.println("WAITING");
+                createRoomSubscribers.put(roomId, client);
+                return "WAITING";
+            case "FALSE":
+                System.out.println("FALSE");
+                return "FALSE";
+            case "TRUE":
+                System.out.println("TRUE");
+                createRoomSubscribers.put(roomId, client );
+                return "TRUE";
+            default:
+                System.out.println("Invalid case");
+                return "FALSE";
+        }
+    }
     public synchronized void addToMainHall(ChatClient client){
         this.mainHall.addMember(client);
         this.meserver.addNewIdentity(client.getChatClientID());

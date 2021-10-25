@@ -124,16 +124,18 @@ public class ServerMessageThread implements Runnable{
                         for (int i = 0; i < neighbour.size(); i++) {
                             System.out.print(" " + neighbour.get(i));
                         }
-                        String gossipNeighbour= (String) neighbour.get(new Random().nextInt(neighbour.size()));
-                        message = gossipMessage(state,neighbour);
-                        try {
-                            send(message,gossipNeighbour);
-                        }catch (IOException ex){
-                            gossipNeighbour= (String) neighbour.get(new Random().nextInt(neighbour.size()));
+                        if (neighbour.size()>0){
+                            String gossipNeighbour= (String) neighbour.get(new Random().nextInt(neighbour.size()));
+                            message = gossipMessage(state,neighbour);
                             try {
-                                send(message, gossipNeighbour);
-                            }catch (IOException e){
-//                                TODO :report server failure
+                                send(message,gossipNeighbour);
+                            }catch (IOException ex){
+                                gossipNeighbour= (String) neighbour.get(new Random().nextInt(neighbour.size()));
+                                try {
+                                    send(message, gossipNeighbour);
+                                }catch (IOException e){
+    //                                TODO :report server failure
+                                }
                             }
                         }
                         break;

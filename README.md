@@ -7,4 +7,8 @@ java -jar client.jar -h localhost -p 4444 -i nilaan -d
 ```bash
 -p "servers.txt" -s "s1"
 ```
+- after buliding the artifact run
+```bash
+-jar .\out\artifacts\DS_K5s_jar\DS_K5s.jar -p "config.txt" -s "s1"
+```
 

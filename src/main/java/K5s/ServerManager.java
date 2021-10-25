@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static K5s.protocol.GossipMessages.gossipMessage;
+import static K5s.protocol.GossipProtocol.gossipMessage;
 import static K5s.protocol.LeaderProtocol.*;
 
 public class ServerManager {
@@ -39,6 +39,7 @@ public class ServerManager {
                         return "WAITING";
                     } catch (IOException e) {
                         e.printStackTrace();
+                        System.out.println("NEW IDENTITY Leader "+meServer.getLeader()+ " is down");
                         initiateLeaderElection();
                         return "FALSE";
                         //this it just an availability measure
@@ -74,6 +75,8 @@ public class ServerManager {
                         return "WAITING";
                     } catch (IOException e) {
                         e.printStackTrace();
+                        System.out.println("NEW ROOM ID Leader "+meServer.getLeader()+ " is down");
+                        initiateLeaderElection();
                         return "FALSE";
                         //this it just an availability measure
                     }
@@ -135,7 +138,7 @@ public class ServerManager {
             try {
                 send(gossipMessage(meServer.getState(), meServer.getOtherServerIdJSONArray()), meServer.getRandomeNeighbour());
             }catch (IOException ioException){
-//                            TODO :detect failure
+                System.out.println("GOSSIP : Server " + meServer.getRandomeNeighbour() + " is down");
             }
         }
     }
@@ -152,10 +155,19 @@ public class ServerManager {
             } catch (IOException e) {
                 System.out.println("BROADCAST Server " + s.getServerId() + " is down");
                 if (s.getServerId() == meServer.getLeader()){
+                    System.out.println("BROADCAST Server " + s.getServerId() + " is LEADER SERVER");
                     initiateLeaderElection();
                 }
             }
         }
+    }
+
+    public synchronized void deleteIdentity(String identity){
+        meServer.removeIdentity(identity);
+    }
+
+    public synchronized void deleteRoom(String room, String serverId){
+        meServer.removeRoom(room, serverId);
     }
 
     private static void send(JSONObject obj, String serverId) throws IOException {

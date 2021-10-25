@@ -59,9 +59,7 @@ public class ChatServer extends Server {
                     for (Object s :state.get(server)){
                         String serverString= (String) s;
                         if (!globalServerState.get(server).contains(serverString)){
-                            if(!globalServerState.get(server).contains(serverString)){
-                                globalServerState.get(server).add(serverString);
-                            }
+                            globalServerState.get(server).add(serverString);
                         }
                     }
                 }
@@ -186,11 +184,20 @@ public class ChatServer extends Server {
         return r;
     }
 
+    public synchronized void removeRoom(String roomId, String serverId){
+        if(globalServerState.containsKey(serverId)){
+            ArrayList<String> s =globalServerState.get(serverId);
+            if(s.contains(roomId)){
+                s.remove(roomId);
+            }
+        }
+    }
+
     public Map<String, ArrayList<String>> getGlobalServerState() {
         return globalServerState;
     }
 
-    public void removeIdentity(String clientID){
+    public synchronized void removeIdentity(String clientID){
         globalIdentity.remove(clientID);
     }
 }

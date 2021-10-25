@@ -8,10 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -71,38 +68,37 @@ public class ClientMessageThread implements Runnable{
             this.in.close();
             this.socket.close();
         }  catch (IOException e) {
-            System.out.println("Communication Error: " + e.getMessage());
+            System.out.println("Error client is uncommunicatable: " + e.getMessage());
 
             boolean isOwner = manager.chatClientQuit(this.client);
-            try {
-                send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
-                if (isOwner){
-                    manager.ownerDeleteRoom(client);
+            if(this.client != null){
+                try {
+                    send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
+                    if (isOwner){
+                        manager.ownerDeleteRoom(client);
+                    }
+                } catch (IOException ex) {
+                    System.out.println("Communication Error: " + ex.getMessage());
                 }
-            } catch (IOException ex) {
-                System.out.println("Communication Error: " + ex.getMessage());
-            } catch (NullPointerException ex){
-                System.out.println("nullpoint");
-//                e.printStackTrace();
             }
 
             running.set(false);
+
         } catch (ParseException e) {
             System.out.println("Message Error: " + e.getMessage());
 
-            boolean isOwner = manager.chatClientQuit(this.client);
-            try {
-                send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
-                if (isOwner){
-                    manager.ownerDeleteRoom(client);
-                }
-            } catch (IOException ex) {
-                System.out.println("Communication Error: " + ex.getMessage());
-            }
-
-            running.set(false);
+//            boolean isOwner = manager.chatClientQuit(this.client);
+//            try {
+//                send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
+//                if (isOwner){
+//                    manager.ownerDeleteRoom(client);
+//                }
+//            } catch (IOException ex) {
+//                System.out.println("Communication Error: " + ex.getMessage());
+//            }
+//
+//            running.set(false);
         }
-
     }
 
     /**

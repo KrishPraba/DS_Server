@@ -81,14 +81,22 @@ public class ServerToClientProtocol {
         JSONObject delete = new JSONObject();
         delete.put("type", "deleteroom");
         delete.put("roomid", roomid);
-        delete.put("approved", approved);
+        delete.put("approved", approved.toString());
         return delete;
     }
 
     public static JSONObject sendDeleteIdenity(String identity) {
         JSONObject delete_identity = new JSONObject();
         delete_identity.put("type", "deleteidenity");
-        delete_identity.put("identityidentity", identity);
+        delete_identity.put("identity", identity);
+        return delete_identity;
+    }
+
+    public static JSONObject sendDeleteRoom(String roomId, String serverId) {
+        JSONObject delete_identity = new JSONObject();
+        delete_identity.put("type", "deleteroom");
+        delete_identity.put("roomid", roomId);
+        delete_identity.put("serverid", serverId);
         return delete_identity;
     }
 

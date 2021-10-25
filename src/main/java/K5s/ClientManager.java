@@ -188,16 +188,16 @@ public class ClientManager {
         roomManager.broadcastMessageToMembers(formerRoom,message);
         roomManager.broadcastMessageToMembers(newRoom,message);
     }
-    public void sendRoomCreateBroadcast(ChatClient client, ChatRoom room){
-        ChatRoom former = client.getRoom();
-//        System.out.println(former.getRoomId());
-//        System.out.println(room.getRoomId());
-        JSONObject message =getRoomChangeBroadcast(client.getChatClientID(),former.getRoomId(),room.getRoomId());
-        client.setRoom(room);
-        roomManager.broadcastMessageToMembers(former,message);
-        roomManager.removeUserFromChatRoom(client);
-
-    }
+//    public void sendRoomCreateBroadcast(ChatClient client, ChatRoom room){
+//        ChatRoom former = client.getRoom();
+////        System.out.println(former.getRoomId());
+////        System.out.println(room.getRoomId());
+//        JSONObject message =getRoomChangeBroadcast(client.getChatClientID(),former.getRoomId(),room.getRoomId());
+//        client.setRoom(room);
+//        roomManager.broadcastMessageToMembers(former,message);
+//        roomManager.removeUserFromChatRoom(client);
+//
+//    }
 
     public synchronized boolean clientDeleteRoom(ChatClient client, String roomId){
         ChatClient owner = roomManager.findOwnerOfRoom(roomId);
@@ -208,6 +208,8 @@ public class ClientManager {
             return false;
         }
         ownerDeleteRoom(client);
+        JSONObject deleteMessage = sendDeleteRoom(roomId,roomManager.getMeserver().getServerId());
+        ServerManager.sendBroadcast(deleteMessage);
         return true;
     }
 
@@ -289,6 +291,9 @@ public class ClientManager {
     public synchronized boolean chatClientQuit(ChatClient client){
         if (client!=null){
             chatClients.remove(client);
+            roomManager.getMeserver().removeIdentity(client.getChatClientID());
+            JSONObject deleteMessage = sendDeleteIdenity(client.getChatClientID());
+            ServerManager.sendBroadcast(deleteMessage);
             boolean isOwner = roomManager.removeUserFromChatRoom(client);
             return isOwner;
         }
@@ -298,6 +303,7 @@ public class ClientManager {
     }
 
     public synchronized void ownerDeleteRoom(ChatClient client){
-        roomManager.deleteRoom(client.getRoom());
+        ChatRoom room = client.getRoom();
+        roomManager.deleteRoom(room);
     }
 }

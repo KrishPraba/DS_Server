@@ -1,6 +1,5 @@
 package K5s.connectionManager;
 
-import K5s.ChatServer;
 import K5s.ClientManager;
 import K5s.ServerManager;
 import K5s.storage.Server;
@@ -13,13 +12,10 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static K5s.protocol.GossipMessages.*;
+import static K5s.protocol.GossipProtocol.*;
 import static K5s.protocol.LeaderProtocol.*;
 
 public class ServerMessageThread implements Runnable{
@@ -66,11 +62,12 @@ public class ServerMessageThread implements Runnable{
         switch (type){
             case "deleteidenity":
                 String deleteIdentity = (String) message.get("identity");
-                ChatServer s = manager.getMeServer();
-                s.removeIdentity(deleteIdentity);
+                manager.deleteIdentity(deleteIdentity);
                 break;
             case "deleteroom":
-
+                String deleteRoom = (String) message.get("roomid");
+                String roomServerId = (String) message.get("serverid");
+                manager.deleteRoom(deleteRoom,roomServerId);
                 break;
             case "bully":
                 String serverId = (String) message.get("serverid");

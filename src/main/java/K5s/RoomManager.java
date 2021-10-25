@@ -74,15 +74,15 @@ public class RoomManager {
         });
     }
 
-    public void broadcastSeperateMessageToMember(ChatClient client, JSONObject jsonObject){
-        try{
-            if (client.getMessageThread()!=null) {
-                client.getMessageThread().MessageReceive(jsonObject);
-            }
-        } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void broadcastSeperateMessageToMember(ChatClient client, JSONObject jsonObject){
+//        try{
+//            if (client.getMessageThread()!=null) {
+//                client.getMessageThread().MessageReceive(jsonObject);
+//            }
+//        } catch (IOException | NullPointerException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public ArrayList<String> getRoomIds(){
         return meserver.getRooms();
@@ -112,6 +112,8 @@ public class RoomManager {
     public synchronized boolean removeUserFromChatRoom(ChatClient client){
 
         ChatRoom room = client.getRoom();
+        JSONObject quitMessage = quitOwnerReply(client.getChatClientID(),room.getRoomId());
+        broadcastMessageToMembers(room, quitMessage);
         room.removeMember(client);
         if (client.equals(room.getOwner())){
             return true;
@@ -140,15 +142,18 @@ public class RoomManager {
     }
 
     public synchronized void deleteRoom(ChatRoom room){
+        chatRooms.remove(room);
+        meserver.removeRoom(room.getRoomId(),meserver.getServerId());
         ArrayList<ChatClient> members = room.getMembers();
         for (ChatClient client:members) {
             JSONObject message =getRoomChangeBroadcast(client.getChatClientID(),room.getRoomId(),mainHall.getRoomId());
-            broadcastSeperateMessageToMember(client, message);
-            room.removeMember(client);
+            broadcastMessageToMembers(room, message);
             JSONObject message2 = getRoomChangeBroadcast(client.getChatClientID(),room.getRoomId(),mainHall.getRoomId());
             broadcastMessageToMembers(mainHall,message2);
+        }
+        for (ChatClient client:members){
+            room.removeMember(client);
             mainHall.addMember(client);
-            chatRooms.remove(room);
             client.setRoom(mainHall);
         }
     }
@@ -179,9 +184,9 @@ public class RoomManager {
         return null;
     }
 
-    public void removeIdentity(String id, JSONObject message){
-        meserver.removeIdentity(id);
-    }
+//    public void removeIdentity(String id, JSONObject message){
+//        meserver.removeIdentity(id);
+//    }
 
     public ChatServer getMeserver() {
         return meserver;

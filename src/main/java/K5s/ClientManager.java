@@ -28,7 +28,9 @@ public class ClientManager {
     }
 
     public synchronized boolean newIdentity(String identity, ClientMessageThread clientMessageThread){
-
+        if(!roomManager.isValidId(identity)){
+            return false;
+        }
         switch (isAvailableIdentity(identity ,clientMessageThread)) {
             case "WAITING":
                 System.out.println("User waiting for approval.");
@@ -45,6 +47,10 @@ public class ClientManager {
         }
     }
     public synchronized boolean newRoom(String roomId, ChatClient client){
+
+        if(!roomManager.isValidId(roomId)){
+            return false;
+        }
 
         switch (roomManager.isAvailableRoomName(roomId ,client)) {
             case "WAITING":
@@ -170,19 +176,19 @@ public class ClientManager {
         return message;
     }
 
-    public synchronized ChatRoom createRoom(ChatClient client, String roomId){
-        ChatRoom former = client.getRoom();
-
-        if(former.getOwner() == client){
-            return null;
-        }
-        boolean isAvailable = roomManager.isRoomIdAvailableToCreate(roomId);
-        if (isAvailable){
-            ChatRoom current = roomManager.createRoom(roomId, client);
-            return current;
-        }
-        return null;
-    }
+//    public synchronized ChatRoom createRoom(ChatClient client, String roomId){
+//        ChatRoom former = client.getRoom();
+//
+//        if(former.getOwner() == client){
+//            return null;
+//        }
+//        boolean isAvailable = roomManager.isRoomIdAvailableToCreate(roomId);
+//        if (isAvailable){
+//            ChatRoom current = roomManager.createRoom(roomId, client);
+//            return current;
+//        }
+//        return null;
+//    }
 
     public static void sendRoomChangeBroadcast(ChatClient client, ChatRoom formerRoom, ChatRoom newRoom){
         JSONObject message =getRoomChangeBroadcast(client.getChatClientID(),formerRoom.getRoomId(),newRoom.getRoomId());

@@ -88,11 +88,11 @@ public class RoomManager {
         return meserver.getRooms();
     }
 
-    public synchronized boolean isRoomIdAvailableToCreate(String roomId){
-        if ((roomId.matches("[a-zA-Z0-9]+")) && (Character.isAlphabetic(roomId.charAt(0)))
-                && (roomId.length() >= 3) && (roomId.length()<=16)){
+    public synchronized boolean isValidId(String id){
+        if ((id.matches("[a-zA-Z0-9]+")) && (Character.isAlphabetic(id.charAt(0)))
+                && (id.length() >= 3) && (id.length()<=16)){
             for (ChatRoom room:chatRooms){
-                if (room.getRoomId().equalsIgnoreCase(roomId)) {
+                if (room.getRoomId().equalsIgnoreCase(id)) {
                     return false;
                 }
             }

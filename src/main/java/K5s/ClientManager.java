@@ -84,6 +84,7 @@ public class ClientManager {
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
+                boolean b =fr.removeMember(user);
                 if(ChatServer.isLeader()){
                     ServerManager.gossipState();
                 }

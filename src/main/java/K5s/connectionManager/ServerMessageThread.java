@@ -12,6 +12,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -77,15 +78,17 @@ public class ServerMessageThread implements Runnable{
                         if (serverId.compareTo(manager.getMeServer().getServerId()) < 0){
                             try{
                                 send(okMessage(manager.getMeServer().getServerId()), serverId);
-                                if(manager.getMeServer().checkLeader()){
+                                if(manager.getMeServer().isLeader()){
                                     send(coordinatorMessage(manager.getMeServer().getServerId()), serverId);
                                 }
+                                manager.initiateLeaderElection();
                             } catch (IOException e) {
                                 e.printStackTrace();
                                 System.out.println("OK AND OR COORDINATOR Server " + serverId + " is down");
                             }
                         } else {
-                            manager.initiateLeaderElection();
+//                            manager.initiateLeaderElection();
+                            System.out.println("WARNING: This message should not be received by this server ");
                         }
 
                         break;
@@ -95,6 +98,15 @@ public class ServerMessageThread implements Runnable{
                         if (serverId.compareTo(manager.getMeServer().getServerId()) < 0){
                             manager.initiateLeaderElection();
                         } else{
+                            if(manager.getMeServer().getLeader()!=null){
+                                if(manager.getMeServer().getLeader().equals(serverId)){
+                                    try {
+                                        send(gossipMessage(manager.getMeServer().getState(), new JSONArray()),serverId);
+                                    }catch (IOException e){
+                                        manager.initiateLeaderElection();
+                                    }
+                                }
+                            }
                             manager.getMeServer().setLeader(serverId);
                             manager.getMeServer().setElectionInProgress(false);
                             System.out.println(serverId+ " has been elected as Leader.");

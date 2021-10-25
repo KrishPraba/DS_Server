@@ -59,6 +59,7 @@ public class ChatServer extends Server {
                     for (Object s :state.get(server)){
                         String serverString= (String) s;
                         if (!globalServerState.get(server).contains(serverString)){
+                            System.out.println(server +" : "+serverString);
                             globalServerState.get(server).add(serverString);
                         }
                     }
@@ -71,6 +72,8 @@ public class ChatServer extends Server {
 
         state.put("serverRooms",new JSONObject(globalServerState));
         state.put("identity", getIdentityJSONArray());
+
+        System.out.println(state);
         return state;
     }
     public String getRandomeNeighbour(){
@@ -132,9 +135,9 @@ public class ChatServer extends Server {
         System.out.println(serverId+" is the leader and "+this.getServerId() +" is Leader : " +isLeader());
     }
 
-    public boolean checkLeader(){
-        return this.isLeader;
-    }
+//    public boolean checkLeader(){
+//        return this.isLeader;
+//    }
 
     public void setElectionInProgress(boolean x){
         this.electionInProgress = x;
@@ -158,6 +161,7 @@ public class ChatServer extends Server {
         return this.globalIdentity;
     }
     public void addRoom(String server,String room){
+        System.out.println(server+" : "+room+"inside add room");
         if(globalServerState.containsKey(server)){
             ArrayList<String> s =globalServerState.get(server);
             if(!s.contains(room)){

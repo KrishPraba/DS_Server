@@ -21,9 +21,9 @@ public class RoomManager {
     public static Map<String,ChatClient> createRoomSubscribers;
 
     public RoomManager(ChatServer meserver){
-        String serverId = "MainHall-"+ meserver.getServerId();
-        this.mainHall = new ChatRoom(serverId,meserver.getServerId() );
-        meserver.addRoom(serverId,mainHall.getRoomId());
+        String roomId = "MainHall-"+ meserver.getServerId();
+        this.mainHall = new ChatRoom(roomId,meserver.getServerId() );
+        meserver.addRoom(meserver.getServerId(),mainHall.getRoomId());
         this.chatRooms = new ArrayList<>();
         chatRooms.add(this.mainHall);
         createRoomSubscribers=new HashMap<>();
@@ -114,7 +114,8 @@ public class RoomManager {
         ChatRoom room = client.getRoom();
         JSONObject quitMessage = quitOwnerReply(client.getChatClientID(),room.getRoomId());
         broadcastMessageToMembers(room, quitMessage);
-        room.removeMember(client);
+//        boolean r = room.removeMember(client);
+        room.getMembers().remove(client);
         if (client.equals(room.getOwner())){
             return true;
         }

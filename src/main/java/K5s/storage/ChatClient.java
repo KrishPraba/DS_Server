@@ -44,4 +44,7 @@ public class ChatClient {
         return this.messageThread;
     }
 
+    public void deleteMessageThread() {
+        this.messageThread=null;
+    }
 }

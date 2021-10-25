@@ -55,21 +55,21 @@ public class ClientMessageThread implements Runnable{
             this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));
             JSONObject message;
             while (this.running.get()){
-//                try {
+                try {
                     message = (JSONObject) parser.parse(in.readLine());
                     System.out.println("Receiving: " + message);
                     this.MessageReceive(message);
-//                }catch (NullPointerException ne){
-//                    System.out.println("nullpoint");
-//
-//                }
+                }catch (NullPointerException ne){
+                    System.out.println("null point");
+                    running.set(false);
+                }
             }
 
             this.in.close();
             this.socket.close();
         }  catch (IOException e) {
-            System.out.println("Error client is uncommunicatable: " + e.getMessage());
-
+            System.out.println("Error client is Incommunicable: " + e.getMessage());
+            this.client.deleteMessageThread();
             boolean isOwner = manager.chatClientQuit(this.client);
             if(this.client != null){
                 try {

@@ -163,7 +163,7 @@ public class ClientMessageThread implements Runnable{
                  * get existing roomIds by calling getRoomIds method of current server
                  * TODO :this method need to be updated to return all the rooms in the entire system
                  */
-                ArrayList<String> roomIds = manager.listRoomIds();
+                ArrayList<String> roomIds = manager.listGlobalRoomIds();
                 send(getListReply(roomIds));
                 break;
             case "who":

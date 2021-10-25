@@ -1,0 +1,8 @@
+java -jar client.jar -h 44.199.212.172 -p 4444 -i ahrooran
+java -jar client.jar -h 44.199.212.172 -p 4446 -i kogul
+ 
+java -jar client.jar -h 3.236.188.77 -p 4444 -i kirishnni 
+java -jar client.jar -h 3.236.188.77 -p 4446 -i  knkk5s
+
+java -jar client.jar -h 3.226.239.194 -p 4444 -i nilaan
+java -jar client.jar -h 3.226.239.194 -p 4446 -i kirishnni1

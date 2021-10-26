@@ -13,7 +13,8 @@ public class Main {
                 GossipMessagesTest.class,
                 ServerMessageTest.class,
                 RoomManagerTest.class,
-                RoomManagerTest_isRoomIdAvailableToCreate.class
+                RoomManagerTest_isRoomIdAvailableToCreate.class,
+                ClientManagerTest.class
         );
 
         for (Failure failure : result.getFailures()) {

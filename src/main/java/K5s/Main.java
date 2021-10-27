@@ -14,15 +14,12 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-//TODO MAINHALL DUPLICATES
-//TODO IO EXCEPTIONS FOR LEADER ELECTION
-//CREATEROOM, DELETEROOM AND QUIT (CTRL +C)
 
 public class Main {
 
     public static void main(String[] args){
         boolean debug;
-        ArrayList<Server> servers=new  ArrayList<>(); //list of
+        ArrayList<Server> servers=new  ArrayList<>(); //list of servers
         ChatServer meServer = null;
         Socket clientSocket;
         ServerSocket clientServerSocket;

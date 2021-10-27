@@ -89,7 +89,6 @@ public class LeaderProtocol {
         leader.put("identity", identity);
         return leader;
     }
-//    TODO:Note: identity is not in the interim report protocol
 
 
     /**
@@ -119,7 +118,6 @@ public class LeaderProtocol {
         leader.put("roomid", roomid);
         return leader;
     }
-//    TODO:Note: roomid  is not in the interim report protocol
 
 
 

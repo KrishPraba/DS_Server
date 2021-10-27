@@ -86,18 +86,6 @@ public class ClientMessageThread implements Runnable{
 
         } catch (ParseException e) {
             System.out.println("Message Error: " + e.getMessage());
-
-//            boolean isOwner = manager.chatClientQuit(this.client);
-//            try {
-//                send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
-//                if (isOwner){
-//                    manager.ownerDeleteRoom(client);
-//                }
-//            } catch (IOException ex) {
-//                System.out.println("Communication Error: " + ex.getMessage());
-//            }
-//
-//            running.set(false);
         }
     }
 
@@ -129,7 +117,6 @@ public class ClientMessageThread implements Runnable{
                 } else {
                     if (manager.newIdentity(identity,this) ) {
                         System.out.println("User waiting for leader approval or got approved");
-//                            clientManager has replied already
                     }else{
                         System.out.println("leader declined.");
                         send(getNewIdentityReply(identity,false));
@@ -161,7 +148,6 @@ public class ClientMessageThread implements Runnable{
             case "list":
                 /**
                  * get existing roomIds by calling getRoomIds method of current server
-                 * TODO :this method need to be updated to return all the rooms in the entire system
                  */
                 ArrayList<String> roomIds = manager.listGlobalRoomIds();
                 send(getListReply(roomIds));
@@ -181,7 +167,6 @@ public class ClientMessageThread implements Runnable{
                  * and send success  message to user and move him/her to the room and
                  * broadcast roomChange message to the respective rooms
                  * Else send fail message to the user
-                 * TODO : inform other servers the creation of new room
                  */
                 String cid = (String) message.get("roomid");
 
@@ -192,7 +177,6 @@ public class ClientMessageThread implements Runnable{
                     ChatClient crClient= this.client;
                     if (manager.newRoom(cid,crClient)){
                         System.out.println("User waiting for leader approval (RoomId) or got approved");
-//                            clientManager has replied already
                     }else{
                         System.out.println("leader declined.");
                         send(getCreateRoomReply(cid,false));
@@ -224,7 +208,6 @@ public class ClientMessageThread implements Runnable{
                 break;
             case "deleteroom":
                 /**
-                 * TODO : inform other servers of room deletion
                  */
                 String rid = (String) message.get("roomid");
                 boolean isApproved = manager.clientDeleteRoom(this.client,rid);
@@ -243,7 +226,6 @@ public class ClientMessageThread implements Runnable{
                 break;
             case "quit":
                 /**
-                 * TODO : inform other servers of room deletion is user is room owner
                  */
                 boolean isOwner = manager.chatClientQuit(this.client);
                 try {
@@ -268,9 +250,6 @@ public class ClientMessageThread implements Runnable{
         System.out.println("Reply :" + obj );
         out.write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
         out.flush();
-//        if (client==null){
-//            this.running.set(false);
-//        }
     }
 
 }

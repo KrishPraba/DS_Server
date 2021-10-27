@@ -22,13 +22,10 @@ import static K5s.protocol.LeaderProtocol.*;
 public class ServerMessageThread implements Runnable{
 
     private ServerSocket serverServerSocket;
-//    private final ChatServer meServer;
     private BufferedReader in;
     private JSONParser parser = new JSONParser();
     private final AtomicBoolean running=new AtomicBoolean(true);
     private static ServerManager manager;
-//    private Timer timer = new Timer();
-//    private DataOutputStream out;
 
 
     public ServerMessageThread(ServerSocket serverServerSocket, ServerManager manager) throws IOException {
@@ -50,8 +47,6 @@ public class ServerMessageThread implements Runnable{
                 MessageReceive(message);
                 }
                 this.in.close();
-//                System.out.println("socket closed");
-//                this.serverServerSocket.close();
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -59,7 +54,6 @@ public class ServerMessageThread implements Runnable{
     private static void MessageReceive(JSONObject message) throws IOException {
         String type = (String) message.get("type");
         String kind =(String) message.get("kind");
-//        System.out.println(kind);
         switch (type){
             case "deleteidenity":
                 String deleteIdentity = (String) message.get("identity");
@@ -87,14 +81,12 @@ public class ServerMessageThread implements Runnable{
                                 System.out.println("OK AND OR COORDINATOR Server " + serverId + " is down");
                             }
                         } else {
-//                            manager.initiateLeaderElection();
                             System.out.println("WARNING: This message should not be received by this server ");
                         }
 
                         break;
 
                     case "COORDINATOR":
-//                        timer.cancel();
                         if (serverId.compareTo(manager.getMeServer().getServerId()) < 0){
                             manager.initiateLeaderElection();
                         } else{
@@ -118,8 +110,6 @@ public class ServerMessageThread implements Runnable{
                         System.out.println("OK received from "+serverId);
                         manager.getMeServer().setElectionInProgress(true);
                         manager.getMeServer().setisOkMessageReceived(false);
-//                        Timer timer = new Timer();
-//                        timer.schedule(task, 4000);
                         break;
                     default:
                         System.out.println(message + " not configured");
@@ -146,7 +136,8 @@ public class ServerMessageThread implements Runnable{
                                 try {
                                     send(message, gossipNeighbour);
                                 }catch (IOException e){
-    //                                TODO :report server failure
+                                    System.out.println("GOSSIP Server " + " is down");
+
                                 }
                             }
                         }
@@ -177,10 +168,9 @@ public class ServerMessageThread implements Runnable{
                         try {
                             send(gossipMessage(manager.getMeServer().getState(), manager.getMeServer().getOtherServerIdJSONArray()), manager.getMeServer().getRandomeNeighbour());
                         }catch (IOException ioException){
-//                            TODO :detect failure
+                            System.out.println("GOSSIP Server " + " is down");
                         }
                     }
-//                    TODO:update Leader state and the methode updates the leader state should initiate the gossip
                 }
                 break;
             case "requestRoomIDApproval":
@@ -200,7 +190,7 @@ public class ServerMessageThread implements Runnable{
                     try {
                         send(gossipMessage(manager.getMeServer().getState(), manager.getMeServer().getOtherServerIdJSONArray()), manager.getMeServer().getRandomeNeighbour());
                     }catch (IOException ioException){
-    //                            TODO :detect failure
+
                     }
                 }
                 break;
@@ -222,21 +212,12 @@ public class ServerMessageThread implements Runnable{
             OutputStream out = ss.getOutputStream();
             out.write((obj.toString() + "\n").getBytes(StandardCharsets.UTF_8));
             out.flush();
-//            out.close();
+
         }
         System.out.println("Reply :" + obj );
 
-//        out.flush();
-//        out.close();
     }
 
-//    TimerTask task = new TimerTask() {
-//        public void run() {
-//            if (meServer.getElectionInProgress() && meServer.isOkMessageReceived()){
-//                initiateLeaderElection();
-//            }
-//        }
-//    };
 
 
 }

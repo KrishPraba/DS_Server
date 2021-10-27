@@ -19,6 +19,7 @@ public class ChatServer extends Server {
     private String leader;
     private boolean electionInProgress = false;
     private boolean isOkMessageReceived =false;
+
     /**
      * @param serverId         serverID
      * @param ipAddress        ipaddress of the current server
@@ -32,7 +33,6 @@ public class ChatServer extends Server {
     }
     public void addNewIdentity(String identity){
         globalIdentity.add(identity);
-//      TODO: need to validate the identity pattern and only approve valid pattern(no nessary since the server itself check for this)
 
     }
 
@@ -67,6 +67,7 @@ public class ChatServer extends Server {
             }
         });
     }
+
     public JSONObject getState(){
         JSONObject state =new JSONObject();
 
@@ -135,9 +136,6 @@ public class ChatServer extends Server {
         System.out.println(serverId+" is the leader and "+this.getServerId() +" is Leader : " +isLeader());
     }
 
-//    public boolean checkLeader(){
-//        return this.isLeader;
-//    }
 
     public void setElectionInProgress(boolean x){
         this.electionInProgress = x;

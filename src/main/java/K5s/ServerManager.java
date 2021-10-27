@@ -82,7 +82,6 @@ public class ServerManager {
                     }
                 }else {
                     initiateLeaderElection();
-//                    TODO:electionmessage
                 }
             }else {
                 return "TRUE";
@@ -129,7 +128,6 @@ public class ServerManager {
             meServer.setElectionInProgress(false);
             System.out.println(meServer.getServerId()+ " is Leader");
         }
-//        timer.schedule(task, 4000);
     }
     public static void gossipState()  {
         try {
@@ -182,7 +180,5 @@ public class ServerManager {
         }
         System.out.println("Reply :" + obj );
 
-//        out.flush();
-//        out.close();
     }
 }

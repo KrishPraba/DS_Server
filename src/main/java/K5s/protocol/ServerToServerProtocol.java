@@ -2,7 +2,7 @@ package K5s.protocol;
 
 import org.json.simple.JSONObject;
 
-public class ServerProtocol {
+public class ServerToServerProtocol {
 
     /**
      * message to inform other servers when a room is deleted

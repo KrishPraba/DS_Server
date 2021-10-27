@@ -1,6 +1,5 @@
 package K5s;
 
-import K5s.connectionManager.ClientMessageThread;
 import K5s.storage.ChatClient;
 import K5s.storage.ChatRoom;
 import K5s.storage.Server;
@@ -74,16 +73,6 @@ public class RoomManager {
         });
     }
 
-//    public void broadcastSeperateMessageToMember(ChatClient client, JSONObject jsonObject){
-//        try{
-//            if (client.getMessageThread()!=null) {
-//                client.getMessageThread().MessageReceive(jsonObject);
-//            }
-//        } catch (IOException | NullPointerException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public ArrayList<String> getRoomIds(){
         return meserver.getRooms();
     }
@@ -96,7 +85,6 @@ public class RoomManager {
                     return false;
                 }
             }
-            //        TODO : check availablity of the room id in the system by referring thru server manager
             return true;
         }
         return false;
@@ -114,7 +102,6 @@ public class RoomManager {
         ChatRoom room = client.getRoom();
         JSONObject quitMessage = quitOwnerReply(client.getChatClientID(),room.getRoomId());
         broadcastMessageToMembers(room, quitMessage);
-//        boolean r = room.removeMember(client);
         room.getMembers().remove(client);
         if (client.equals(room.getOwner())){
             return true;
@@ -184,10 +171,6 @@ public class RoomManager {
 
         return null;
     }
-
-//    public void removeIdentity(String id, JSONObject message){
-//        meserver.removeIdentity(id);
-//    }
 
     public ChatServer getMeserver() {
         return meserver;

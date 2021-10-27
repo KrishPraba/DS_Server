@@ -4,18 +4,19 @@ import org.json.simple.JSONObject;
 
 public class ServerToServerProtocol {
 
-    /**
-     * message to inform other servers when a room is deleted
-     *
-     * @param roomid roomId to be deleted
-     * @param serverid current serverId
-     * @return      JSONObject
-     */
-    public static JSONObject getDeleteRoomInform(String roomid,String serverid) {
-        JSONObject delete = new JSONObject();
-        delete.put("type", "deleteroom");
-        delete.put("roomid", roomid);
-        delete.put("serverid", serverid);
-        return delete;
+
+    public static JSONObject sendDeleteIdenity(String identity) {
+        JSONObject delete_identity = new JSONObject();
+        delete_identity.put("type", "deleteidenity");
+        delete_identity.put("identity", identity);
+        return delete_identity;
+    }
+
+    public static JSONObject sendDeleteRoom(String roomId, String serverId) {
+        JSONObject delete_identity = new JSONObject();
+        delete_identity.put("type", "deleteroom");
+        delete_identity.put("roomid", roomId);
+        delete_identity.put("serverid", serverId);
+        return delete_identity;
     }
 }

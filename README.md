@@ -9,7 +9,10 @@ java -jar client.jar -h localhost -p 4444 -i adel -d
 ```
 - after building the artifact run
 ```bash
--jar .\out\artifacts\DS_K5s_jar\DS_K5s.jar -p "config.txt" -s "s1"
--jar DS_K5s.jar -p "config.txt" -s "s1"
+java -jar .\out\artifacts\DS_K5s_jar\DS_K5s.jar -p "servers.txt" -s "s1"
+
+OR
+
+java -jar DS_K5s.jar -p "config.txt" -s "s1"
 ```
 

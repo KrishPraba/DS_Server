@@ -6,8 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerToClientProtocol {
-    
-    
+
+    //    newIdentity request
+    public static JSONObject getNewIdentityRequest(String identity) {
+        JSONObject newIdentity = new JSONObject();
+        newIdentity.put("type", "newidentity");
+        newIdentity.put("identity", identity);
+        return newIdentity;
+    }
+
+    //reply
+    public static JSONObject getNewIdentityReply(String identity,Boolean approved) {
+        JSONObject newIdentity = new JSONObject();
+        newIdentity.put("type", "newidentity");
+        newIdentity.put("identity", identity);
+        newIdentity.put("approved", approved.toString());
+        return newIdentity;
+    }
+
     public static JSONObject getCreateRoomRequest(String roomid) {
         JSONObject create_room = new JSONObject();
         create_room.put("type", "createroom");
@@ -30,13 +46,7 @@ public class ServerToClientProtocol {
         join.put("roomid", roomid);
         return join;
     }
-    //reply
-    public static JSONObject getJoinRoomReply(String roomid) {
-        JSONObject join = new JSONObject();
-        join.put("type", "joinroom");
-        join.put("roomid", roomid);
-        return join;
-    }
+
     //  roomChange broadcast
     public static JSONObject getRoomChangeBroadcast(String identity,String former , String roomid) {
         JSONObject change_room = new JSONObject();
@@ -77,34 +87,19 @@ public class ServerToClientProtocol {
 
     //    delete room
     //request
-    public static JSONObject getDeleteRoomRequest(String roomid,Boolean approved) {
-        JSONObject delete = new JSONObject();
-        delete.put("type", "deleteroom");
-        delete.put("roomid", roomid);
-        delete.put("approved", approved.toString());
-        return delete;
-    }
-
-    public static JSONObject sendDeleteIdenity(String identity) {
-        JSONObject delete_identity = new JSONObject();
-        delete_identity.put("type", "deleteidenity");
-        delete_identity.put("identity", identity);
-        return delete_identity;
-    }
-
-    public static JSONObject sendDeleteRoom(String roomId, String serverId) {
-        JSONObject delete_identity = new JSONObject();
-        delete_identity.put("type", "deleteroom");
-        delete_identity.put("roomid", roomId);
-        delete_identity.put("serverid", serverId);
-        return delete_identity;
-    }
-
-    //reply
     public static JSONObject getDeleteRoomRequest(String roomid) {
         JSONObject delete = new JSONObject();
         delete.put("type", "deleteroom");
         delete.put("roomid", roomid);
+        return delete;
+    }
+
+    //reply
+    public static JSONObject getDeleteRoomReply(String roomid,Boolean approved) {
+        JSONObject delete = new JSONObject();
+        delete.put("type", "deleteroom");
+        delete.put("roomid", roomid);
+        delete.put("approved", approved.toString());
         return delete;
     }
     //  List
@@ -176,20 +171,4 @@ public class ServerToClientProtocol {
         return change_room;
     }
 
-    //    newIdentity request
-    public static JSONObject getNewIdentityRequest(String identity) {
-        JSONObject newIdentity = new JSONObject();
-        newIdentity.put("type", "newidentity");
-        newIdentity.put("identity", identity);
-        return newIdentity;
-    }
-    //reply
-
-    public static JSONObject getNewIdentityReply(String identity,Boolean approved) {
-        JSONObject newIdentity = new JSONObject();
-        newIdentity.put("type", "newidentity");
-        newIdentity.put("identity", identity);
-        newIdentity.put("approved", approved.toString());
-        return newIdentity;
-    }
 }

@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static K5s.protocol.ServerToClientProtocol.*;
+import static K5s.protocol.ServerToServerProtocol.sendDeleteIdenity;
+import static K5s.protocol.ServerToServerProtocol.sendDeleteRoom;
 
 public class ClientManager {
 
@@ -109,7 +111,12 @@ public class ClientManager {
                 user.setRoom(roomManager.getMainHall());
                 roomManager.addToMainHall(user);
                 clientMessageThread.setClient(user);
-                sendMainhallBroadcast(user);
+                try {
+                    clientMessageThread.send(getNewIdentityReply(user.getChatClientID(),true));
+                    sendMainhallBroadcast(user);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 identitySubscribers.remove(identity);
                 if(ChatServer.isLeader()){
                     ServerManager.gossipState();

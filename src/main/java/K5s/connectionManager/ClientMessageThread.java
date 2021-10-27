@@ -212,10 +212,10 @@ public class ClientMessageThread implements Runnable{
                 String rid = (String) message.get("roomid");
                 boolean isApproved = manager.clientDeleteRoom(this.client,rid);
                 if (isApproved){
-                    send(getDeleteRoomRequest(rid,true));
+                    send(getDeleteRoomReply(rid,true));
                 }
                 else{
-                    send(getDeleteRoomRequest(rid,false));
+                    send(getDeleteRoomReply(rid,false));
                 }
                 break;
             case "roomchange":

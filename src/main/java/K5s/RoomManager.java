@@ -94,6 +94,7 @@ public class RoomManager {
     public synchronized ChatRoom createRoom(String roomId, ChatClient client){
         ChatRoom room = new ChatRoom(roomId, client);
         this.chatRooms.add(room);
+        meserver.addRoom(meserver.getServerId(),roomId);
         return room;
     }
 

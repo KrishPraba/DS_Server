@@ -188,9 +188,8 @@ public class ChatServer extends Server {
 
     public synchronized void removeRoom(String roomId, String serverId){
         if(globalServerState.containsKey(serverId)){
-            ArrayList<String> s =globalServerState.get(serverId);
-            if(s.contains(roomId)){
-                s.remove(roomId);
+            if(globalServerState.get(serverId).contains(roomId)){
+                globalServerState.get(serverId).remove(roomId);
             }
         }
     }

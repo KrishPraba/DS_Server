@@ -71,14 +71,10 @@ public class ClientMessageThread implements Runnable{
             System.out.println("Error client is Incommunicable: " + e.getMessage());
             this.client.deleteMessageThread();
             boolean isOwner = manager.chatClientQuit(this.client);
+            System.out.println(this.client);
             if(this.client != null){
-                try {
-                    send(quitOwnerReply(client.getChatClientID(),client.getRoom().getRoomId()));
-                    if (isOwner){
-                        manager.ownerDeleteRoom(client);
-                    }
-                } catch (IOException ex) {
-                    System.out.println("Communication Error: " + ex.getMessage());
+                if (isOwner){
+                    manager.ownerDeleteRoom(client);
                 }
             }
 

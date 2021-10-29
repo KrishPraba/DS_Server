@@ -166,9 +166,6 @@ public class ClientManager {
 
     public ArrayList<String> listGlobalRoomIds(){
         ArrayList<String> roomIds = roomManager.getRoomIds();
-        ArrayList<String> rooms = roomManager.getMeserver().getRooms();
-        roomIds.removeAll(rooms);
-        roomIds.addAll(rooms);
         return roomIds;
     }
 

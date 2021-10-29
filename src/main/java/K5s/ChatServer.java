@@ -176,7 +176,7 @@ public class ChatServer extends Server {
         ArrayList<String> r = new ArrayList<>();
         globalServerState.keySet().forEach(key ->
                 globalServerState.get(key).forEach(room ->{
-                    if (!r.contains(r)){
+                    if (!r.contains(room)){
                          r.add(room);
 
                     }

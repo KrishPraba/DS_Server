@@ -55,7 +55,7 @@ public class ServerManager {
         Map<String, ArrayList<String>> gS = meServer.getGlobalServerState();
         for (String key : gS.keySet()) {
             for (String room : gS.get(key)) {
-                if (room == roomid) {
+                if (room.compareTo(roomid) == 0) {
                     return key;
                 }
             }
